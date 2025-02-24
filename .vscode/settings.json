@@ -43,11 +43,7 @@
 	"prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
 	"typescript.tsdk": ".yarn/sdks/typescript/lib",
 	"typescript.enablePromptUseWorkspaceTsdk": true,
-	"cSpell.words": [
-		"adrien",
-		"Agafonkin",
-		"suncalc"
-	],
+	"cSpell.words": ["adrien", "Agafonkin", "suncalc"],
 	"[json]": {
 		"editor.defaultFormatter": "vscode.json-language-features"
 	},

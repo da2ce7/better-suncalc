@@ -91,7 +91,11 @@ export type PositionData = {
 };
 
 // calculates sun position for a given date and latitude/longitude
-export function getPosition(date: Date, lat: number, lng: number): PositionData {
+export function getPosition(
+  date: Date,
+  lat: number,
+  lng: number,
+): PositionData {
   const lw = rad * -lng,
     phi = rad * lat,
     d = toDays(date),
@@ -115,7 +119,11 @@ const times: Array<[number, string, string]> = [
 ];
 
 // adds a custom time to the times config
-export function addTime(angle: number, riseName: string, setName: string): void {
+export function addTime(
+  angle: number,
+  riseName: string,
+  setName: string,
+): void {
   times.push([angle, riseName, setName]);
 }
 
@@ -138,7 +146,15 @@ function hourAngle(h: number, phi: number, d: number) {
 }
 
 // returns set time for the given sun altitude
-function getSetJ(h: number, lw: number, phi: number, dec: number, n: number, M: number, L: number): number {
+function getSetJ(
+  h: number,
+  lw: number,
+  phi: number,
+  dec: number,
+  n: number,
+  M: number,
+  L: number,
+): number {
   const w = hourAngle(h, phi, dec),
     a = approxTransit(w, lw, n);
   return solarTransitJ(a, M, L);
@@ -220,7 +236,11 @@ export type MoonPositionData = {
   parallacticAngle: number;
 };
 
-export function getMoonPosition(date: Date, lat: number, lng: number): MoonPositionData {
+export function getMoonPosition(
+  date: Date,
+  lat: number,
+  lng: number,
+): MoonPositionData {
   const lw = rad * -lng,
     phi = rad * lat,
     d = toDays(date),
@@ -240,7 +260,11 @@ export function getMoonPosition(date: Date, lat: number, lng: number): MoonPosit
   };
 }
 
-export type MoonIlluminationData = { fraction: number; phase: number; angle: number };
+export type MoonIlluminationData = {
+  fraction: number;
+  phase: number;
+  angle: number;
+};
 
 // calculations for illumination parameters of the moon,
 // based on http://idlastro.gsfc.nasa.gov/ftp/pro/astro/mphase.pro formulas and
@@ -250,9 +274,14 @@ export function getMoonIllumination(date: Date): MoonIlluminationData {
     s = sunCoords(d),
     m = moonCoords(d),
     sdist = 149598000, // distance from Earth to Sun in km
-    phi = acos(sin(s.dec) * sin(m.dec) + cos(s.dec) * cos(m.dec) * cos(s.ra - m.ra)),
+    phi = acos(
+      sin(s.dec) * sin(m.dec) + cos(s.dec) * cos(m.dec) * cos(s.ra - m.ra),
+    ),
     inc = atan(sdist * sin(phi), m.dist - sdist * cos(phi)),
-    angle = atan(cos(s.dec) * sin(s.ra - m.ra), sin(s.dec) * cos(m.dec) - cos(s.dec) * sin(m.dec) * cos(s.ra - m.ra));
+    angle = atan(
+      cos(s.dec) * sin(s.ra - m.ra),
+      sin(s.dec) * cos(m.dec) - cos(s.dec) * sin(m.dec) * cos(s.ra - m.ra),
+    );
 
   return {
     fraction: (1 + cos(inc)) / 2,
@@ -273,7 +302,12 @@ export type MoonTimesData = {
 };
 
 // calculations for moon rise/set times are based on http://www.stargazing.net/kepler/moonrise.html article
-export function getMoonTimes(date: Date, lat: number, lng: number, inUTC: boolean): MoonTimesData {
+export function getMoonTimes(
+  date: Date,
+  lat: number,
+  lng: number,
+  inUTC: boolean,
+): MoonTimesData {
   const t = new Date(date);
   if (inUTC) {
     t.setUTCHours(0, 0, 0, 0);

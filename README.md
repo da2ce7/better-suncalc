@@ -71,7 +71,7 @@ Returns an object with the following properties (each is a `Date` object):
 SunCalc.addTime(
 	/*Number*/ angleInDegrees,
 	/*String*/ morningName,
-	/*String*/ eveningName
+	/*String*/ eveningName,
 );
 ```
 
@@ -85,7 +85,7 @@ Adds a custom time when the sun reaches the given angle to results returned by `
 SunCalc.getPosition(
 	/*Date*/ timeAndDate,
 	/*Number*/ latitude,
-	/*Number*/ longitude
+	/*Number*/ longitude,
 );
 ```
 
@@ -102,7 +102,7 @@ Returns an object with the following properties:
 SunCalc.getMoonPosition(
 	/*Date*/ timeAndDate,
 	/*Number*/ latitude,
-	/*Number*/ longitude
+	/*Number*/ longitude,
 );
 ```
 

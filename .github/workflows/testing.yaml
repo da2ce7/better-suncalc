@@ -1,0 +1,60 @@
+name: Testing
+
+on:
+    push:
+    pull_request:
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+    format:
+        name: Formatting
+        runs-on: ubuntu-latest
+
+        steps:
+            - id: checkout
+              name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - id: setup
+              name: Setup Toolchain
+              run: corepack enable
+
+            - id: update
+              name: Run Formatting-Checks
+              run: yarn
+
+            - id: check
+              name: Run Formatting-Checks
+              run: yarn run format:check
+
+            - id: lint
+              name: Run Code Quality Checks
+              run: yarn run lint
+
+    unit:
+        name: Units
+        runs-on: ubuntu-latest
+        needs: format
+
+        steps:
+            - id: checkout
+              name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - id: setup
+              name: Setup Toolchain
+              run: corepack enable
+
+            - id: update
+              name: Run Formatting-Checks
+              run: yarn
+
+            - id: check
+              name: Run Formatting-Checks
+              run: yarn run build
+
+            - id: lint
+              name: Run Code Quality Checks
+              run: yarn run test
