@@ -1,6 +1,6 @@
-# SunCalc TS
+# (better) SunCalc
 
-[![QC Checks](https://github.com/e-adrien/suncalc-ts/actions/workflows/quality-control.yml/badge.svg)](https://github.com/e-adrien/suncalc-ts/actions/workflows/quality-control.yml)
+[![Testing](https://github.com/da2ce7/better-suncalc/actions/workflows/testing.yaml/badge.svg)](https://github.com/da2ce7/better-suncalc/actions/workflows/testing.yaml)
 
 (better) SunCalc is a tiny BSD-licensed TypeScript library for calculating sun position,
 sunlight phases (times for sunrise, sunset, dusk, etc.),
@@ -33,11 +33,11 @@ var sunriseAzimuth = (sunrisePos.azimuth * 180) / Math.PI;
 SunCalc is also available as an NPM package:
 
 ```bash
-$ npm install suncalc-ts
+$ npm install better-suncalc
 ```
 
 ```js
-var SunCalc = require("suncalc-ts");
+var SunCalc = require("better-suncalc");
 ```
 
 ## Reference
@@ -155,5 +155,5 @@ Returns an object with the following properties:
 - `alwaysUp`: `true` if the moon never rises/sets and is always _above_ the horizon during the day
 - `alwaysDown`: `true` if the moon is always _below_ the horizon
 
-By default, it will search for moon rise and set during local user's day (frou 0 to 24 hours).
+By default, it will search for moon rise and set during local user's day (from 0 to 24 hours).
 If `inUTC` is set to true, it will instead search the specified date from 0 to 24 UTC hours.

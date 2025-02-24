@@ -1,5 +1,5 @@
 {
-	"name": "better-suncalc-ts",
+	"name": "better-suncalc",
 	"version": "3.0.0",
 	"description": "A tiny TypeScript library for calculating sun/moon positions and phases.",
 	"author": "Vladimir Agafonkin",
@@ -44,7 +44,9 @@
 		"sunset",
 		"twilight",
 		"moon",
-		"illumination"
+		"illumination",
+		"solstice",
+		"equinox"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.21.0",

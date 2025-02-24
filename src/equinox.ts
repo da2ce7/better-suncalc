@@ -4,6 +4,19 @@ import { J2000 } from "./constants";
 import { sunCoords } from "./suncalc";
 import { fromJulian, toDays } from "./utils";
 
+/* ==================== Equinox Events ==================== */
+
+/**
+ * Contains vernal/autumnal equinox dates within a specified time range.
+ */
+export type EquinoxData = {
+  /** Vernal (spring) equinox dates (northern hemisphere) in UTC */
+  vernal: Date[];
+
+  /** Autumnal (fall) equinox dates (northern hemisphere) in UTC */
+  autumnal: Date[];
+};
+
 /**
  * For a given day (expressed in days since J2000), returns the sun's declination (in radians).
  * At the equinox, we want to find when this value is zero.
@@ -61,8 +74,6 @@ function approximateEquinoxForYear(year: number): {
     autumnal: toDays(autumnalDate),
   };
 }
-
-export type EquinoxData = { vernal: Date[]; autumnal: Date[] };
 
 /**
  * Finds all equinox events (vernal and autumnal) occurring within the given date range.

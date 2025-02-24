@@ -2,6 +2,10 @@
 
 ## Changelog
 
+#### 3.0.0 &da2ce7; Feb 25, 2025
+
+- Migrate to Yarn 4.6, rework packaging, rename to (better) SunCalc
+
 #### 2.0.0 &andiling; May 14, 2024
 
 - Migrate the codebase to TypeScript

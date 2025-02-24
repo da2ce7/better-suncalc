@@ -1,21 +1,8 @@
 /*
   index.ts
 
-  (better) SunCalc
+  (better) SunCalc - A tiny sun and moon calculation library.
 */
-
-export {
-  cos,
-  dayMs,
-  e,
-  J0,
-  J1970,
-  J2000,
-  PI,
-  rad,
-  sin,
-  tan,
-} from "./constants";
 
 export { fromJulian, hoursLater, toDays, toJulian } from "./utils";
 

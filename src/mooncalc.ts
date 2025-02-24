@@ -17,6 +17,63 @@ import {
 } from "./suncalc";
 import { hoursLater, toDays } from "./utils";
 
+/* ==================== Moon Types ==================== */
+
+/**
+ * Represents the moon's position and related parameters at a specific time and location.
+ */
+export type MoonPositionData = {
+  /** Azimuth angle in radians (clockwise from true north) */
+  azimuth: number;
+
+  /** Altitude angle in radians above horizon (includes atmospheric refraction correction) */
+  altitude: number;
+
+  /** Distance to moon in kilometers */
+  distance: number;
+
+  /** Parallactic angle - angle between moon position and local zenith,
+   *  useful for lunar observations and photography (radians)
+   */
+  parallacticAngle: number;
+};
+
+/**
+ * Describes the moon's illumination phase and visibility.
+ */
+export type MoonIlluminationData = {
+  /** Illuminated fraction (0 = new moon, 1 = full moon) */
+  fraction: number;
+
+  /** Moon phase (0-1):
+   * - 0 = New Moon
+   * - 0.25 = First Quarter
+   * - 0.5 = Full Moon
+   * - 0.75 = Last Quarter
+   */
+  phase: number;
+
+  /** Angle of the illuminated terminator (radians, eastward from north) */
+  angle: number;
+};
+
+/**
+ * Moon rise/set times and visibility status.
+ */
+export type MoonTimesData = {
+  /** Moonrise time (if occurs on date) */
+  rise?: Date;
+
+  /** Moonset time (if occurs on date) */
+  set?: Date;
+
+  /** True if moon never sets (polar day) */
+  alwaysUp?: boolean;
+
+  /** True if moon never rises (polar day) */
+  alwaysDown?: boolean;
+};
+
 /* ==================== Moon calculations ==================== */
 
 /**
@@ -42,13 +99,6 @@ export function moonCoords(d: number): {
     dist: dt,
   };
 }
-
-export type MoonPositionData = {
-  azimuth: number;
-  altitude: number;
-  distance: number;
-  parallacticAngle: number;
-};
 
 /**
  * Calculates moon position for provided date and location.
@@ -80,12 +130,6 @@ export function getMoonPosition(
   };
 }
 
-export type MoonIlluminationData = {
-  fraction: number;
-  phase: number;
-  angle: number;
-};
-
 /**
  * Calculates moon illumination parameters.
  * @param date - Date/time of observation.
@@ -111,13 +155,6 @@ export function getMoonIllumination(date: Date): MoonIlluminationData {
     angle: angle,
   };
 }
-
-export type MoonTimesData = {
-  rise?: Date;
-  set?: Date;
-  alwaysUp?: boolean;
-  alwaysDown?: boolean;
-};
 
 /**
  * Calculates moon rise and set times for given date and location.

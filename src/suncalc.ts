@@ -20,6 +20,39 @@ import {
 } from "./constants";
 import { fromJulian, toDays } from "./utils";
 
+/* ==================== Sun Types ==================== */
+
+/**
+ * Represents the sun's position at a specific time and location.
+ */
+export type PositionData = {
+  /** Azimuth angle in radians (clockwise from true north) */
+  azimuth: number;
+
+  /** Altitude angle in radians above horizon (0 at horizon, positive upwards).
+   *  Includes correction for atmospheric refraction.
+   */
+  altitude: number;
+};
+
+/**
+ * Contains calculated solar times for a specific date and location.
+ */
+export type TimesData = {
+  /** Solar noon (sun at highest position) */
+  solarNoon: Date;
+
+  /** Nadir (darkest moment of night, solar midnight) */
+  nadir: Date;
+
+  /** Additional time events defined through addTime() such as:
+   * - sunrise/sunset (center at horizon)
+   * - dawn/dusk (when sun reaches 6° below horizon)
+   * - golden hour boundaries
+   */
+  [key: string]: Date;
+};
+
 /* ==================== Sun calculations ==================== */
 
 /**
@@ -117,11 +150,6 @@ export function sunCoords(d: number): { dec: number; ra: number } {
     ra: rightAscension(L, 0),
   };
 }
-
-export type PositionData = {
-  azimuth: number;
-  altitude: number;
-};
 
 /**
  * Calculates sun position for given date and location.
@@ -240,12 +268,6 @@ export function getSetJ(
   const a = approxTransit(w, lw, n);
   return solarTransitJ(a, M, L);
 }
-
-export type TimesData = {
-  solarNoon: Date;
-  nadir: Date;
-  [key: string]: Date;
-};
 
 /**
  * Calculates sun times (e.g., sunrise, sunset, dawn etc.) for given date and location.

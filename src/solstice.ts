@@ -1,7 +1,21 @@
 /* solstice.ts */
 
+import { J2000 } from "./constants";
 import { sunCoords } from "./suncalc";
 import { fromJulian, toDays } from "./utils";
+
+/* ==================== Solstice Events ==================== */
+
+/**
+ * Contains solar solstice dates within a specified time range.
+ */
+export type SolsticeData = {
+  /** Summer solstice dates (northern hemisphere) in UTC */
+  summer: Date[];
+
+  /** Winter solstice dates (northern hemisphere) in UTC */
+  winter: Date[];
+};
 
 /**
  * Returns the sun’s declination (in radians) at a given time expressed as days since J2000.
@@ -65,8 +79,6 @@ function approximateSolsticeForYear(year: number): {
   };
 }
 
-export type SolsticeData = { summer: Date[]; winter: Date[] };
-
 /**
  * Finds all solstice events (summer and winter) that occur within the given datetime range.
  * The algorithm uses a per-year approximate guess, then refines via Newton’s method applied
@@ -94,8 +106,8 @@ export function getSolstices(rangeStart: Date, rangeEnd: Date): SolsticeData {
 
     // Convert days since J2000 back to full Julian date and then to Date.
     // Note: J2000 corresponds to JD 2451545.
-    const jdSummer = refinedSummer + 2451545;
-    const jdWinter = refinedWinter + 2451545;
+    const jdSummer = refinedSummer + J2000;
+    const jdWinter = refinedWinter + J2000;
     const summerDate = fromJulian(jdSummer);
     const winterDate = fromJulian(jdWinter);
 
