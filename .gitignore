@@ -1,16 +1,15 @@
 # Generated files
 tsconfig.build.tsbuildinfo
 dist/
+*.js
+*.map
 
 # Yarn & node.js dependencies
 node_modules/
 .pnp.*
-.yarn/
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
+.yarn/*
 !.yarn/sdks
-!.yarn/versions
+
 
 # Yarn lockfile
 yarn.lock
