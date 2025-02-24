@@ -1,24 +1,4 @@
 {
-	"search.exclude": {
-		"**/.git/**": true,
-		"**/node_modules/**": true,
-		"**/.yarn/**": true,
-		"**/dist/**": true,
-		"**/.yarn": true,
-		"**/.pnp.*": true
-	},
-	"files.exclude": {
-		"**/.git/**": true,
-		"**/node_modules/**": true,
-		"**/.yarn/**": true,
-		"**/dist/**": true
-	},
-	"files.watcherExclude": {
-		"**/.git/**": true,
-		"**/node_modules/**": true,
-		"**/.yarn/**": true,
-		"**/dist/**": true
-	},
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"editor.codeActionsOnSave": {
@@ -39,7 +19,7 @@
 		"typescriptreact"
 	],
 	"prettier.ignorePath": ".prettierignore",
-	"eslint.nodePath": ".yarn/sdks/",
+	"eslint.nodePath": ".yarn/sdks",
 	"prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
 	"typescript.tsdk": ".yarn/sdks/typescript/lib",
 	"typescript.enablePromptUseWorkspaceTsdk": true,
@@ -49,5 +29,9 @@
 	},
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"search.exclude": {
+		"**/.yarn": true,
+		"**/.pnp.*": true
 	}
 }
