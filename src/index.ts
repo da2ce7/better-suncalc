@@ -1,3 +1,9 @@
+/*
+  index.ts
+
+  (better) SunCalc
+*/
+
 export {
   cos,
   dayMs,
@@ -21,18 +27,11 @@ export {
   azimuth,
   declination,
   eclipticLongitude,
-  getMoonIllumination,
-  getMoonPosition,
-  getMoonTimes,
   getPosition,
   getSetJ,
   getTimes,
   hourAngle,
   julianCycle,
-  moonCoords,
-  MoonIlluminationData,
-  MoonPositionData,
-  MoonTimesData,
   PositionData,
   rightAscension,
   siderealTime,
@@ -41,3 +40,17 @@ export {
   sunCoords,
   TimesData,
 } from "./suncalc";
+
+export {
+  getMoonIllumination,
+  getMoonPosition,
+  getMoonTimes,
+  moonCoords,
+  MoonIlluminationData,
+  MoonPositionData,
+  MoonTimesData,
+} from "./mooncalc";
+
+export { getSolstices, SolsticeData } from "./solstice";
+
+export { EquinoxData, getEquinoxes } from "./equinox";

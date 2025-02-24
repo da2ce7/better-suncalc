@@ -1,3 +1,9 @@
+/*
+  utils.ts
+
+  Common Utility Functions
+*/
+
 import { dayMs, J1970, J2000 } from "./constants";
 
 /**

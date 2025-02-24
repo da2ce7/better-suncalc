@@ -1,6 +1,11 @@
 {
 	"words": [
 		"Illum",
+		"Jnoon",
+		"Jrise",
+		"Jset",
+		"mooncalc",
+		"sdist",
 		"suncalc"
 	],
 	"enableFiletypes": [
