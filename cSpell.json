@@ -1,0 +1,11 @@
+{
+	"words": [
+		"Illum",
+		"suncalc"
+	],
+	"enableFiletypes": [
+		"dockerfile",
+		"shellscript",
+		"toml"
+	]
+}

@@ -47,16 +47,11 @@
 		"illumination"
 	],
 	"devDependencies": {
-		"@babel/core": "^7.26.9",
-		"@babel/preset-env": "^7.26.9",
-		"@babel/preset-typescript": "^7.26.0",
 		"@eslint/js": "^9.21.0",
 		"@tsconfig/node20": "^20.1.4",
-		"@types/babel__core": "^7",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^22.13.5",
 		"@types/webpack": "^5.28.5",
-		"babel-jest": "^29.7.0",
 		"eslint": "^9.21.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-define-config": "^2.1.0",
@@ -74,13 +69,5 @@
 		"webpack": "^5.98.0",
 		"webpack-cli": "^6.0.1"
 	},
-	"packageManager": "yarn@4.6.0",
-	"dependenciesMeta": {
-		"eslint@9.21.0": {
-			"unplugged": true
-		},
-		"prettier@3.5.2": {
-			"unplugged": true
-		}
-	}
+	"packageManager": "yarn@4.6.0"
 }
