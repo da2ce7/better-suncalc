@@ -6,6 +6,9 @@
 
 - Update Branding to (better) SunCalc
 - Move to Yarn PnP
+- Move to yest.
+- Use Webpack for Packaging
+- Simplified CI
 
 #### 2.0.0 &andiling; May 14, 2024
 
