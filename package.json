@@ -18,13 +18,16 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "yarn run build:dev",
+    "build:dev": "tsc && webpack --mode development",
+    "build:prod": "tsc && webpack --mode production",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "prepublish": "yarn run test",
     "test": "jest",
+    "prepublish": "yarn run test",
+    "prepack": "yarn run build:prod",
     "postinstall": "prettier --write package.json"
   },
   "files": [
@@ -32,9 +35,11 @@
   ],
   "devDependencies": {
     "@eslint/js": "^9.20.0",
-    "@tsconfig/node20": "^20.1.4",
+    "@tsconfig/node22": "^22",
     "@types/jest": "^29",
-    "@types/node": "^22",
+    "@types/node": "^22.13.4",
+    "@types/webpack": "^5",
+    "dts-bundle-webpack": "^1",
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
     "globals": "^15.15.0",
@@ -42,10 +47,13 @@
     "jiti": "^2",
     "prettier": "^3.5.1",
     "ts-jest": "^29",
+    "ts-loader": "^9",
     "ts-node": "^10.9.2",
     "typedoc": "^0.27.7",
     "typescript": "^5.7.3",
-    "typescript-eslint": "8.24.0"
+    "typescript-eslint": "8.24.0",
+    "webpack": "^5",
+    "webpack-cli": "^6"
   },
   "packageManager": "yarn@4.6.0"
 }
