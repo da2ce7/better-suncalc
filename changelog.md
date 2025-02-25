@@ -9,6 +9,8 @@
 - Move to yest.
 - Use Webpack for Packaging
 - Simplified CI
+- Refactored Codebase
+- Added Solstice and Equinox Calculations
 
 #### 2.0.0 &andiling; May 14, 2024
 

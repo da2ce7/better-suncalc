@@ -1,17 +1,9 @@
 # (better) SunCalc
 
-[![QC Checks](https://github.com/da2ce7/better-suncalc/actions/workflows/quality-control.yml/badge.svg)](https://github.com/da2ce7/better-suncalc/actions/workflows/quality-control.yml)
+[![Testing](https://github.com/da2ce7/better-suncalc/actions/workflows/testing.yaml/badge.svg)](https://github.com/da2ce7/better-suncalc/actions/workflows/testing.yaml)
 
-(better) SunCalc is a tiny BSD-licensed TypeScript library for calculating sun position,
-sunlight phases (times for sunrise, sunset, dusk, etc.),
-moon position and lunar phase for the given location and time,
-originally created by [Vladimir Agafonkin](http://agafonkin.com/en) ([@mourner](https://github.com/mourner)) a part of the [SunCalc.net project](http://suncalc.net), since then it has been modernized by [Adrien Eraud](https://lesjours.fr/) ([@e-adrien](https://github.com/e-adrien)).
-
-Most calculations are based on the formulas given in the excellent Astronomy Answers articles
-about [position of the sun](http://aa.quae.nl/en/reken/zonpositie.html)
-and [the planets](http://aa.quae.nl/en/reken/hemelpositie.html).
-You can read about different twilight phases calculated by SunCalc
-in the [Twilight article on Wikipedia](http://en.wikipedia.org/wiki/Twilight).
+(better) SunCalc is a small BSD-licensed TypeScript library for calculating sun position,
+sunlight phases (times for sunrise, sunset, dusk, etc.), the solstices and equinoxes, moon position and lunar phase for the given location and time.
 
 ## Usage example
 
@@ -29,10 +21,10 @@ var sunrisePos = SunCalc.getPosition(times.sunrise, 51.5, -0.1);
 var sunriseAzimuth = (sunrisePos.azimuth * 180) / Math.PI;
 ```
 
-SunCalc is also available as an NPM package:
+(better) SunCalc is also available as an NPM package:
 
 ```bash
-$ npm install suncalc-ts
+$ npm install better-suncalc
 ```
 
 ```js
@@ -156,3 +148,13 @@ Returns an object with the following properties:
 
 By default, it will search for moon rise and set during local user's day (from 0 to 24 hours).
 If `inUTC` is set to true, it will instead search the specified date from 0 to 24 UTC hours.
+
+### Credits
+
+**SunCalc** was originally created by [Vladimir Agafonkin](http://agafonkin.com/en) ([@mourner](https://github.com/mourner)) a part of the [SunCalc.net project](http://suncalc.net), since then it has been modernized as **SunCalc TS** [Adrien Eraud](https://lesjours.fr/) ([@e-adrien](https://github.com/e-adrien)).
+
+Most calculations are based on the formulas given in the excellent Astronomy Answers articles
+about [position of the sun](http://aa.quae.nl/en/reken/zonpositie.html)
+and [the planets](http://aa.quae.nl/en/reken/hemelpositie.html).
+You can read about different twilight phases calculated by SunCalc
+in the [Twilight article on Wikipedia](http://en.wikipedia.org/wiki/Twilight).
