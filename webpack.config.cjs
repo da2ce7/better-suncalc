@@ -17,8 +17,8 @@ module.exports = {
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
-    libraryTarget: "umd",
-    library: "BetterSunCalc",
+    type: "umd",
+    library: "(better) SunCalc",
     globalObject: "this",
   },
 };

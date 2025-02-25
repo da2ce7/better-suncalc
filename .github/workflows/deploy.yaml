@@ -1,8 +1,9 @@
-name: Testing
+name: Deploy
 
 on:
     push:
-    pull_request:
+        tags:
+            - "v*.."
 
 env:
     CARGO_TERM_COLOR: always
