@@ -21,9 +21,9 @@ jobs:
               name: Setup Toolchain
               run: corepack enable
 
-            - id: update
-              name: Run Formatting-Checks
-              run: yarn
+            - id: install
+              name: Install Dependencies
+              run: yarn install
 
             - id: check
               name: Run Formatting-Checks
@@ -47,9 +47,9 @@ jobs:
               name: Setup Toolchain
               run: corepack enable
 
-            - id: update
-              name: Run Formatting-Checks
-              run: yarn
+            - id: install
+              name: Install Dependencies
+              run: yarn install
 
             - id: check
               name: Run Formatting-Checks

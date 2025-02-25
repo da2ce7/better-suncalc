@@ -9,9 +9,5 @@
 		"sdist",
 		"suncalc"
 	],
-	"enableFiletypes": [
-		"dockerfile",
-		"shellscript",
-		"toml"
-	]
+	"enableFiletypes": ["dockerfile", "shellscript", "toml"]
 }
