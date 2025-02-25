@@ -5,6 +5,7 @@
 #### 3.0.0 &da2ce7; Feb 25, 2025
 
 - Update Branding to (better) SunCalc
+- Move to Yarn PnP
 
 #### 2.0.0 &andiling; May 14, 2024
 

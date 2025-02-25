@@ -12,34 +12,21 @@
     "access": "public"
   },
   "engines": {
-    "node": "20.x || 22.x || 24.x"
+    "node": "22.x || 24.x"
   },
-  "main": "./dist/index.js",
+  "main": "./dist/bundle.js",
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "freshlock": "rm -rf node_modules/ && rm .yarn/install-state.gz && rm yarn.lock && yarn",
-    "eslint-check": "eslint .",
-    "eslint-fix": "eslint . --fix",
-    "prettier-check": "prettier --check .",
-    "prettier-fix": "prettier --write .",
-    "test": "NODE_OPTIONS='--loader=ts-node/esm' mocha",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "prepublish": "yarn run test"
   },
   "files": [
-    "src/**/*",
-    "dist/**/*"
-  ],
-  "keywords": [
-    "sun",
-    "astronomy",
-    "math",
-    "calculation",
-    "sunrise",
-    "sunset",
-    "twilight",
-    "moon",
-    "illumination"
+    "dist"
   ],
   "devDependencies": {
     "@eslint/js": "^9.20.0",
@@ -49,6 +36,7 @@
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
     "globals": "^15.15.0",
+    "jiti": "^2",
     "mocha": "^11.1.0",
     "prettier": "^3.5.1",
     "ts-node": "^10.9.2",

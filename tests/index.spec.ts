@@ -1,5 +1,11 @@
 import assert from "assert";
-import { getMoonIllumination, getMoonPosition, getMoonTimes, getPosition, getTimes } from "../src/index.js";
+import {
+  getMoonIllumination,
+  getMoonPosition,
+  getMoonTimes,
+  getPosition,
+  getTimes,
+} from "../src/index.js";
 
 function near(val1: number, val2: number, margin: number = 1e-15): boolean {
   return Math.abs(val1 - val2) < margin;
@@ -37,7 +43,11 @@ it("getTimes returns sun phases for the given date and location", function () {
   const times = getTimes(date, lat, lng);
 
   for (const i in testTimes) {
-    assert.strictEqual(new Date(testTimes[i]).toUTCString(), times[i].toUTCString(), i);
+    assert.strictEqual(
+      new Date(testTimes[i]).toUTCString(),
+      times[i].toUTCString(),
+      i,
+    );
   }
 });
 
@@ -60,6 +70,12 @@ it("getMoonIllumination returns fraction and angle of moon's illuminated limb an
 it("getMoonTimes returns moon rise and set times", function () {
   const moonTimes = getMoonTimes(new Date("2013-03-04UTC"), lat, lng, true);
 
-  assert.strictEqual(moonTimes.rise?.toUTCString(), "Mon, 04 Mar 2013 23:54:29 GMT");
-  assert.strictEqual(moonTimes.set?.toUTCString(), "Mon, 04 Mar 2013 07:47:58 GMT");
+  assert.strictEqual(
+    moonTimes.rise?.toUTCString(),
+    "Mon, 04 Mar 2013 23:54:29 GMT",
+  );
+  assert.strictEqual(
+    moonTimes.set?.toUTCString(),
+    "Mon, 04 Mar 2013 07:47:58 GMT",
+  );
 });
