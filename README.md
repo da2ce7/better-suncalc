@@ -1,12 +1,11 @@
-# SunCalc TS
+# (better) SunCalc
 
-[![QC Checks](https://github.com/e-adrien/suncalc-ts/actions/workflows/quality-control.yml/badge.svg)](https://github.com/e-adrien/suncalc-ts/actions/workflows/quality-control.yml)
+[![QC Checks](https://github.com/da2ce7/better-suncalc/actions/workflows/quality-control.yml/badge.svg)](https://github.com/da2ce7/better-suncalc/actions/workflows/quality-control.yml)
 
-SunCalc is a tiny BSD-licensed JavaScript library for calculating sun position,
+(better) SunCalc is a tiny BSD-licensed TypeScript library for calculating sun position,
 sunlight phases (times for sunrise, sunset, dusk, etc.),
 moon position and lunar phase for the given location and time,
-created by [Vladimir Agafonkin](http://agafonkin.com/en) ([@mourner](https://github.com/mourner))
-as a part of the [SunCalc.net project](http://suncalc.net).
+originally created by [Vladimir Agafonkin](http://agafonkin.com/en) ([@mourner](https://github.com/mourner)) a part of the [SunCalc.net project](http://suncalc.net), since then it has been modernized by [Adrien Eraud](https://lesjours.fr/) ([@e-adrien](https://github.com/e-adrien)).
 
 Most calculations are based on the formulas given in the excellent Astronomy Answers articles
 about [position of the sun](http://aa.quae.nl/en/reken/zonpositie.html)

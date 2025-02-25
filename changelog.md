@@ -1,6 +1,10 @@
-# SunCalc TS
+# (better) SunCalc
 
 ## Changelog
+
+#### 3.0.0 &da2ce7; Feb 25, 2025
+
+- Update Branding to (better) SunCalc
 
 #### 2.0.0 &andiling; May 14, 2024
 

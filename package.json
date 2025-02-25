@@ -1,12 +1,12 @@
 {
-  "name": "suncalc-ts",
-  "version": "2.0.5",
-  "description": "A tiny JavaScript library for calculating sun/moon positions and phases.",
-  "author": "Vladimir Agafonkin",
-  "repository": "e-adrien/suncalc-ts",
-  "homepage": "https://github.com/e-adrien/suncalc-ts#readme",
+  "name": "better-suncalc",
+  "version": "3.0.0",
+  "description": "A small TypeScript library for calculating sun/moon positions and phases.",
+  "author": "Cameron Garnham",
+  "repository": "da2ce7/better-suncalc",
+  "homepage": "https://github.com/da2ce7/better-suncalc#readme",
   "bugs": {
-    "url": "https://github.com/e-adrien/suncalc-ts/issues"
+    "url": "https://github.com/da2ce7/better-suncalc/issues"
   },
   "publishConfig": {
     "access": "public"
