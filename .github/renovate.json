@@ -1,24 +1,24 @@
 {
-	"extends": ["config:recommended", ":semanticCommits"],
-	"timezone": "Europe/Paris",
-	"schedule": ["before 4:00 am on the first day of the month"],
-	"rangeStrategy": "bump",
-	"packageRules": [
-		{
-			"matchDatasources": ["npm"],
-			"minimumReleaseAge": "3 days"
-		},
-		{
-			"matchDatasources": ["npm"],
-			"matchUpdateTypes": ["minor", "patch"],
-			"matchPackageNames": ["*"],
-			"groupName": "all non-major dependencies",
-			"groupSlug": "all-minor-patch",
-			"automerge": true,
-			"automergeType": "pr",
-			"automergeStrategy": "squash"
-		}
-	],
-	"ignoreDeps": [],
-	"ignorePaths": []
+  "extends": ["config:recommended", ":semanticCommits"],
+  "timezone": "Europe/Paris",
+  "schedule": ["before 4:00 am on the first day of the month"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchDatasources": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": ["*"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    }
+  ],
+  "ignoreDeps": [],
+  "ignorePaths": []
 }

@@ -5,7 +5,7 @@ import {
   getMoonTimes,
   getPosition,
   getTimes,
-} from "../src/index.js";
+} from "../src/index";
 
 function near(val1: number, val2: number, margin: number = 1e-15): boolean {
   return Math.abs(val1 - val2) < margin;

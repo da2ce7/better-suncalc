@@ -1,18 +1,18 @@
 {
-	"compilerOptions": {
-		"outDir": "./dist",
-		"allowJs": false,
-		"checkJs": false,
-		"esModuleInterop": true,
-		"declaration": true,
-		"declarationMap": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"module": "es2020",
-		"moduleResolution": "bundler"
-	},
-	"include": ["src/**/*", "tests/**/*"]
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": false,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "module": "es2020",
+    "moduleResolution": "bundler"
+  },
+  "include": ["src/**/*", "tests/**/*"]
 }

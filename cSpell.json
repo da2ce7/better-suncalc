@@ -1,19 +1,19 @@
 {
-	"words": [
-		"Adrien",
-		"Agafonkin",
-		"Eraud",
-		"freshlock",
-		"Garnham",
-		"Illum",
-		"Jnoon",
-		"Jrise",
-		"Jset",
-		"Meeus",
-		"mooncalc",
-		"sdist",
-		"suncalc",
-		"Willmann"
-	],
-	"enableFiletypes": ["dockerfile", "shellscript", "toml"]
+  "words": [
+    "Adrien",
+    "Agafonkin",
+    "Eraud",
+    "freshlock",
+    "Garnham",
+    "Illum",
+    "Jnoon",
+    "Jrise",
+    "Jset",
+    "Meeus",
+    "mooncalc",
+    "sdist",
+    "suncalc",
+    "Willmann"
+  ],
+  "enableFiletypes": ["dockerfile", "shellscript", "toml"]
 }

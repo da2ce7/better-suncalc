@@ -68,9 +68,9 @@ Returns an object with the following properties (each is a `Date` object):
 
 ```javascript
 SunCalc.addTime(
-	/*Number*/ angleInDegrees,
-	/*String*/ morningName,
-	/*String*/ eveningName,
+  /*Number*/ angleInDegrees,
+  /*String*/ morningName,
+  /*String*/ eveningName,
 );
 ```
 
@@ -82,9 +82,9 @@ Adds a custom time when the sun reaches the given angle to results returned by `
 
 ```javascript
 SunCalc.getPosition(
-	/*Date*/ timeAndDate,
-	/*Number*/ latitude,
-	/*Number*/ longitude,
+  /*Date*/ timeAndDate,
+  /*Number*/ latitude,
+  /*Number*/ longitude,
 );
 ```
 
@@ -99,9 +99,9 @@ Returns an object with the following properties:
 
 ```javascript
 SunCalc.getMoonPosition(
-	/*Date*/ timeAndDate,
-	/*Number*/ latitude,
-	/*Number*/ longitude,
+  /*Date*/ timeAndDate,
+  /*Number*/ latitude,
+  /*Number*/ longitude,
 );
 ```
 
