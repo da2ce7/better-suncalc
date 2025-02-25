@@ -23,7 +23,7 @@ jobs:
 
             - id: install
               name: Install Dependencies
-              run: yarn install
+              run: yarn install --no-immutable
 
             - id: check
               name: Run Formatting-Checks
@@ -49,7 +49,7 @@ jobs:
 
             - id: install
               name: Install Dependencies
-              run: yarn install
+              run: yarn install --no-immutable
 
             - id: check
               name: Run Formatting-Checks
