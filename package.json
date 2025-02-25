@@ -1,12 +1,12 @@
 {
 	"name": "better-suncalc",
-	"version": "3.0.0-alpha.3",
+	"version": "3.0.0-alpha.5",
 	"description": "A tiny TypeScript library for calculating sun/moon positions and phases.",
 	"author": "Vladimir Agafonkin",
-	"repository": "da2ce7/suncalc-ts",
-	"homepage": "https://github.com/da2ce7/suncalc-ts#readme",
+	"repository": "da2ce7/better-suncalc",
+	"homepage": "https://github.com/da2ce7/better-suncalc#readme",
 	"bugs": {
-		"url": "https://github.com/da2ce7/suncalc-ts/issues"
+		"url": "https://github.com/da2ce7/better-suncalc/issues"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -51,10 +51,11 @@
 	],
 	"devDependencies": {
 		"@eslint/js": "^9",
-		"@tsconfig/node20": "^20",
+		"@tsconfig/node22": "^22",
 		"@types/jest": "^29",
 		"@types/node": "^22",
 		"@types/webpack": "^5",
+		"dts-bundle-webpack": "^1",
 		"eslint": "^9",
 		"eslint-config-prettier": "^10",
 		"eslint-define-config": "^2",

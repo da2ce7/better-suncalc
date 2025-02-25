@@ -1,4 +1,5 @@
 const path = require("path");
+const DtsBundleWebpack = require("dts-bundle-webpack");
 
 module.exports = {
   entry: "./src/index.ts",
@@ -24,4 +25,12 @@ module.exports = {
     },
     globalObject: "this",
   },
+  plugins: [
+    new DtsBundleWebpack({
+      name: "better-suncalc",
+      main: "dist/src/index.d.ts",
+      baseDir: "dist",
+      out: "index.d.ts",
+    }),
+  ],
 };
