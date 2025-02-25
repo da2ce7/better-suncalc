@@ -2,6 +2,7 @@ const path = require("path");
 
 module.exports = {
   entry: "./src/index.ts",
+  devtool: "source-map",
   module: {
     rules: [
       {
@@ -17,8 +18,10 @@ module.exports = {
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
-    type: "umd",
-    library: "(better) SunCalc",
+    library: {
+      name: "better-suncalc",
+      type: "umd",
+    },
     globalObject: "this",
   },
 };
