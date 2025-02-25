@@ -1,6 +1,6 @@
 {
 	"name": "better-suncalc",
-	"version": "3.0.0",
+	"version": "3.0.0-alpha.0",
 	"description": "A tiny TypeScript library for calculating sun/moon positions and phases.",
 	"author": "Vladimir Agafonkin",
 	"repository": "da2ce7/suncalc-ts",
@@ -72,5 +72,6 @@
 		"webpack": "^5",
 		"webpack-cli": "^6"
 	},
-	"packageManager": "yarn@4.6.0"
+	"packageManager": "yarn@4.6.0",
+	"stableVersion": "3.0.0"
 }
