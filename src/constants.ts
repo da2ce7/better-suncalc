@@ -63,21 +63,34 @@ export const atan2 = Math.atan2;
 
 /** ================= Temporal Constants and Epoch Definitions ============== */
 
-/** Milliseconds in a standard day (24h × 60m × 60s × 1000ms) */
+/**
+ * Milliseconds in a standard day (24h × 60m × 60s × 1000ms).
+ * @constant {number}
+ */
 export const DAY_IN_MS: number = 86_400_000;
 
-/** Milliseconds in one hour (60m × 60s × 1000ms) */
+/**
+ * Milliseconds in one hour (60m × 60s × 1000ms).
+ * @constant {number}
+ */
 export const HOUR_IN_MS: number = 3_600_000;
 
 /**
- * Julian Date (JD) of Unix epoch (1970-01-01T00:00:00Z)
+ * Julian Date (JD) of the Unix epoch (noon 1970-01-01 UTC).
+ * @constant {number}
  * @remarks
- * Calculated as JD 2440587.5 (standard Unix epoch) + 0.5 day offset
+ * Represents 1970-01-01T12:00:00 UTC as JD 2440588.0, chosen because:
+ * - Midnight UTC 1970-01-01 is JD 2440587.5
+ * - This noon alignment simplifies Date ↔ JD conversions
  */
-export const J1970: number = 2440588.0;
+export const J1970 = 2440588.0;
 
-/** Julian Date of J2000 epoch (2000-01-01T12:00:00 TT) */
-export const J2000: number = 2451545.0;
+/**
+ * J2000 epoch (2000-01-01T12:00:00 TT) as Julian Date.
+ * @constant {number}
+ * @see ref [J2000 Epoch](https://en.wikipedia.org/wiki/Epoch_(astronomy)#J2000)
+ */
+export const J2000 = 2451545.0;
 
 /** ============== Earth's Orbital and Axial Characteristics ================ */
 
@@ -181,12 +194,12 @@ export const REFRACTION_OPTIONS = Object.freeze({
   /** Minimum apparent altitude (-0.83°) in radians */
   MIN_ALT_RAD: -0.83 * DEGREE_IN_RADIANS,
 
-  /** Refraction coefficient (0.0347°) */
-  COEFF_DEG: 0.0347,
+  /** Refraction coefficient (0.017°) – 1.02 arcminutes converted to degrees */
+  COEFF_DEG: 0.017, // 1.02/60 ≈ 0.017°
 
-  /** Formula stabilization parameters */
-  OFFSET_DEG: 5.16, // Numerator adjustment term
-  DENOM_ADD_DEG: 4.32, // Denominator stabilization term
+  /** Saemundsson adjustment terms */
+  OFFSET_DEG: 10.3, // Numerator correction term
+  DENOM_ADD_DEG: 5.11, // Denominator stabilization term
 });
 
 /** ===================== Reference Astronomical Events =================== */
