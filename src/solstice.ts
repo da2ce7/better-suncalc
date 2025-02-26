@@ -1,124 +1,89 @@
-/* solstice.ts */
-
-import { J2000 } from "./constants";
-import { sunCoords } from "./suncalc";
-import { fromJulian, toDays } from "./utils";
-
-/* ==================== Solstice Events ==================== */
-
 /**
- * Contains solar solstice dates within a specified time range.
+ * Solstice calculations: Finds June/December solstices (peak declinations)
+ * @warning Accuracy degrades beyond ±10,000 years due to orbital model limitations!
  */
-export type SolsticeData = {
-  /** Summer solstice dates (northern hemisphere) in UTC */
-  summer: Date[];
 
-  /** Winter solstice dates (northern hemisphere) in UTC */
-  winter: Date[];
+import {
+  CONVERGENCE_WINDOW,
+  J2000,
+  REFERENCE_SUMMER_JD,
+  TROPICAL_YEAR,
+} from "./constants";
+import { sunCoords } from "./suncalc";
+import {
+  addUniqueJD,
+  generateEventSeeds,
+  refineEvent,
+  solarDeclinationRate as utilSolarDeclinationRate,
+} from "./utils";
+
+export type SolsticeData = {
+  summer: number[]; // Northern summer (June) solstices as Julian days
+  winter: number[]; // Northern winter (December) solstices
 };
 
 /**
- * Returns the sun’s declination (in radians) at a given time expressed as days since J2000.
- * This is the function whose extrema correspond to the solstices.
- * @param d - Days since J2000.
- * @returns Declination in radians.
+ * Calculate solstices within a date range
+ * @param startJD Start Julian day
+ * @param endJD End Julian day
+ * @returns Object with summer/winter solstice JDs sorted ascending
  */
-function solDec(d: number): number {
-  return sunCoords(d).dec;
+export function getSolstices(startJD: number, endJD: number): SolsticeData {
+  if (startJD > endJD) [startJD, endJD] = [endJD, startJD];
+
+  // Generate seeds from both solstice references
+  const seeds = generateEventSeeds(
+    startJD,
+    endJD,
+    REFERENCE_SUMMER_JD,
+    TROPICAL_YEAR,
+    CONVERGENCE_WINDOW,
+  ).concat(
+    generateEventSeeds(
+      startJD,
+      endJD,
+      REFERENCE_SUMMER_JD + 0.5 * TROPICAL_YEAR,
+      TROPICAL_YEAR,
+      CONVERGENCE_WINDOW,
+    ),
+  );
+
+  return validateSolstices(seeds, startJD, endJD);
 }
 
 /**
- * Refines an approximate solstice time (given in days since J2000) by Newton–Raphson iteration.
- * The method uses finite-difference estimates of the first and second derivatives of the sun's declination.
- *
- * @param guess - The initial guess (in days since J2000).
- * @returns A refined value of d (days since J2000) where the derivative is nearly zero.
+ * Refines seeds into solstice JDs, classifying by declination sign
  */
-function refineSolstice(guess: number): number {
-  let d = guess;
-  const delta = 0.001; // small time step in days (~86.4 seconds)
-  const eps = 1e-8; // convergence tolerance in days
-  for (let i = 0; i < 20; i++) {
-    // Finite-difference estimates:
-    const fPlus = solDec(d + delta);
-    const fMinus = solDec(d - delta);
-    const f0 = solDec(d);
-    // First derivative estimate:
-    const fPrime = (fPlus - fMinus) / (2 * delta);
-    // Second derivative estimate:
-    const fDouble = (fPlus - 2 * f0 + fMinus) / (delta * delta);
-    // Prevent division by near-zero:
-    if (Math.abs(fDouble) < 1e-14) break;
-    const dNew = d - fPrime / fDouble;
-    if (Math.abs(dNew - d) < eps) {
-      d = dNew;
-      break;
-    }
-    d = dNew;
-  }
-  return d;
-}
+function validateSolstices(
+  seeds: number[],
+  startJD: number,
+  endJD: number,
+): SolsticeData {
+  const data: SolsticeData = { summer: [], winter: [] };
 
-/**
- * For a given year, returns an approximate starting guess for the summer and winter solstices.
- * (Note: In JavaScript Date, month is 0-indexed: 5 for June and 11 for December.)
- *
- * @param year - The calendar year.
- * @returns Object with properties 'summer' and 'winter', each expressed in days since J2000.
- */
-function approximateSolsticeForYear(year: number): {
-  summer: number;
-  winter: number;
-} {
-  // Use June 21 and December 21 UT as rough initial guesses.
-  const summerDate = new Date(Date.UTC(year, 5, 21, 0, 0, 0)); // June 21
-  const winterDate = new Date(Date.UTC(year, 11, 21, 0, 0, 0)); // December 21
-  return {
-    summer: toDays(summerDate),
-    winter: toDays(winterDate),
-  };
-}
+  const declinationRate = (t: number) =>
+    utilSolarDeclinationRate((innerT) => sunCoords(innerT).dec, t);
 
-/**
- * Finds all solstice events (summer and winter) that occur within the given datetime range.
- * The algorithm uses a per-year approximate guess, then refines via Newton’s method applied
- * to the derivative of the sun's declination.
- *
- * The function returns an object containing arrays of Date objects for summer and winter solstices.
- *
- * @param rangeStart - Starting Date of the range.
- * @param rangeEnd - Ending Date of the range.
- * @returns Object with keys 'summer' and 'winter', each an array of Date instances.
- */
-export function getSolstices(rangeStart: Date, rangeEnd: Date): SolsticeData {
-  const solstices = { summer: [] as Date[], winter: [] as Date[] };
+  for (const jdApprox of seeds) {
+    const t = jdApprox - J2000;
 
-  // Determine the range in calendar years. Include one extra year on each end to catch edge events.
-  const startYear = rangeStart.getUTCFullYear();
-  const endYear = rangeEnd.getUTCFullYear();
+    // Refine where declination rate is zero (peak)
+    const refinedJD = refineEvent(t, declinationRate, 0) + J2000;
 
-  for (let year = startYear - 1; year <= endYear + 1; year++) {
-    const approx = approximateSolsticeForYear(year);
+    // Validate JD range
+    if (refinedJD < startJD || refinedJD > endJD) continue;
 
-    // Refine each approximate event: obtain refined times in days since J2000.
-    const refinedSummer = refineSolstice(approx.summer);
-    const refinedWinter = refineSolstice(approx.winter);
-
-    // Convert days since J2000 back to full Julian date and then to Date.
-    // Note: J2000 corresponds to JD 2451545.
-    const jdSummer = refinedSummer + J2000;
-    const jdWinter = refinedWinter + J2000;
-    const summerDate = fromJulian(jdSummer);
-    const winterDate = fromJulian(jdWinter);
-
-    // If the calculated event falls within the requested range, add it to the results.
-    if (summerDate >= rangeStart && summerDate <= rangeEnd) {
-      solstices.summer.push(summerDate);
-    }
-    if (winterDate >= rangeStart && winterDate <= rangeEnd) {
-      solstices.winter.push(winterDate);
+    // Classify by declination (+ = summer, - = winter)
+    const dec = sunCoords(refinedJD - J2000).dec;
+    if (dec > 0) {
+      addUniqueJD(data.summer, refinedJD);
+    } else {
+      addUniqueJD(data.winter, refinedJD);
     }
   }
 
-  return solstices;
+  // Sort results chronologically
+  data.summer.sort((a, b) => a - b);
+  data.winter.sort((a, b) => a - b);
+  return data;
 }

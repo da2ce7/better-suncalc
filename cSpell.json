@@ -1,13 +1,26 @@
 {
 	"words": [
 		"Agafonkin",
+		"arcminutes",
+		"arcseconds",
+		"COEFF",
+		"COEFFS",
+		"ephemerides",
 		"Illum",
 		"Jnoon",
 		"Jrise",
 		"Jset",
 		"mooncalc",
+		"Raphson",
+		"SAEMUNDSSON",
 		"sdist",
-		"suncalc"
+		"suncalc",
+		"timestep",
+		"USNO"
 	],
-	"enableFiletypes": ["dockerfile", "shellscript", "toml"]
+	"enableFiletypes": [
+		"dockerfile",
+		"shellscript",
+		"toml"
+	]
 }

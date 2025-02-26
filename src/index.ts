@@ -4,7 +4,7 @@
   (better) SunCalc - A tiny sun and moon calculation library.
 */
 
-export { fromJulian, hoursLater, toDays, toJulian } from "./utils";
+export { toDays } from "./utils";
 
 export {
   addTime,

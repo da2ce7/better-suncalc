@@ -5,17 +5,18 @@
   Depends on suncalc.ts, constants.ts, and utils.ts for shared functions and constants.
 */
 
-import { acos, atan, cos, PI, rad, sin, tan } from "./constants";
+import { acos, atan2, cos, DEGREE_IN_RADIANS, PI, sin, tan } from "./constants";
+import { declination, rightAscension, sunCoords } from "./suncalc";
 import {
   altitude,
   astroRefraction,
   azimuth,
-  declination,
-  rightAscension,
+  hoursLater,
+  latitudeToRad,
+  longitudeToRadWest,
   siderealTime,
-  sunCoords,
-} from "./suncalc";
-import { hoursLater, toDays } from "./utils";
+  toDays,
+} from "./utils";
 
 /* ==================== Moon Types ==================== */
 
@@ -86,11 +87,11 @@ export function moonCoords(d: number): {
   dec: number;
   dist: number;
 } {
-  const L = rad * (218.316 + 13.176396 * d);
-  const M = rad * (134.963 + 13.064993 * d);
-  const F = rad * (93.272 + 13.22935 * d);
-  const l = L + rad * 6.289 * sin(M);
-  const b = rad * 5.128 * sin(F);
+  const L = DEGREE_IN_RADIANS * (218.316 + 13.176396 * d);
+  const M = DEGREE_IN_RADIANS * (134.963 + 13.064993 * d);
+  const F = DEGREE_IN_RADIANS * (93.272 + 13.22935 * d);
+  const l = L + DEGREE_IN_RADIANS * 6.289 * sin(M);
+  const b = DEGREE_IN_RADIANS * 5.128 * sin(F);
   const dt = 385001 - 20905 * cos(M);
 
   return {
@@ -112,13 +113,13 @@ export function getMoonPosition(
   lat: number,
   lng: number,
 ): MoonPositionData {
-  const lw = rad * -lng;
-  const phi = rad * lat;
+  const lw = longitudeToRadWest(lng);
+  const phi = latitudeToRad(lat);
   const d = toDays(date);
   const c = moonCoords(d);
   const H = siderealTime(d, lw) - c.ra;
   let h = altitude(H, phi, c.dec);
-  const pa = atan(sin(H), tan(phi) * cos(c.dec) - sin(c.dec) * cos(H));
+  const pa = atan2(sin(H), tan(phi) * cos(c.dec) - sin(c.dec) * cos(H));
 
   h += astroRefraction(h);
 
@@ -143,8 +144,8 @@ export function getMoonIllumination(date: Date): MoonIlluminationData {
   const phi = acos(
     sin(s.dec) * sin(m.dec) + cos(s.dec) * cos(m.dec) * cos(s.ra - m.ra),
   );
-  const inc = atan(sdist * sin(phi), m.dist - sdist * cos(phi));
-  const angle = atan(
+  const inc = atan2(sdist * sin(phi), m.dist - sdist * cos(phi));
+  const angle = atan2(
     cos(s.dec) * sin(s.ra - m.ra),
     sin(s.dec) * cos(m.dec) - cos(s.dec) * sin(m.dec) * cos(s.ra - m.ra),
   );
@@ -174,7 +175,7 @@ export function getMoonTimes(
   if (inUTC) t.setUTCHours(0, 0, 0, 0);
   else t.setHours(0, 0, 0, 0);
 
-  const hc = 0.133 * rad;
+  const hc = 0.133 * DEGREE_IN_RADIANS;
   let h0 = getMoonPosition(t, lat, lng).altitude - hc;
   let rise: number | undefined, set: number | undefined;
   let ye = 0;
