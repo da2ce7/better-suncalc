@@ -7,6 +7,8 @@
  * @warning Accuracy may degrade over very long time spans due to perturbations in the moon's orbit.
  */
 
+import { LUNAR } from "./constraints/lunar";
+import { JULIAN_EPOCH_J2000 } from "./constraints/time";
 import { getMoonIllumination } from "./mooncalc";
 import { addUniqueJD, generateEventSeeds, refineEvent } from "./utils";
 
@@ -33,14 +35,15 @@ export function getMoonPhases(
   }
 
   // Calculate the reference JD for the target phase based on the new moon reference
-  const referenceJD = REFERENCE_NEW_MOON_JD + targetPhase * SYNODIC_MONTH_DAYS;
+  const referenceJD =
+    LUNAR.PHASES.REFERENCE_NEW_MOON + targetPhase * LUNAR.PHASES.SYNODIC_MONTH;
 
   // Generate approximate seed times for the target phase events
   const seeds = generateEventSeeds(
     startJD,
     endJD,
     referenceJD,
-    SYNODIC_MONTH_DAYS,
+    LUNAR.PHASES.SYNODIC_MONTH,
     5, // Convergence window of 5 days to ensure all events are captured
   );
 

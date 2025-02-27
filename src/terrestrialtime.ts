@@ -1,4 +1,4 @@
-import { DELTA_T_POLYNOMIAL_SEGMENTS } from "./constraints/time";
+import { DELTA_T_POLYNOMIAL_SEGMENTS } from "./constraints/earth";
 
 /**
  * Configuration for ΔT (TT - UTC) polynomial approximations

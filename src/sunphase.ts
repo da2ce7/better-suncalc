@@ -11,6 +11,7 @@
  * @warning Accuracy may degrade over very long time spans due to variations in Earth's orbit.
  */
 
+import { EARTH } from "./constraints/earth";
 import { PI, TAU } from "./constraints/math";
 import { JULIAN_EPOCH_J2000 } from "./constraints/time";
 import { eclipticLongitude, solarMeanAnomaly } from "./suncoords";
@@ -41,14 +42,16 @@ export function getSunPhases(
   }
 
   // Calculate the reference JD for the target phase relative to the reference March equinox
-  const referenceJD = VERNAL_EQUINOX_2000_JD + targetPhase * TROPICAL_YEAR_DAYS;
+  const referenceJD =
+    EARTH.SEASONAL_EVENTS.VERNAL_EQUINOX_2000 +
+    targetPhase * EARTH.ORBIT.TROPICAL_YEAR;
 
   // Generate approximate seed times for the phase events within the range
   const seeds = generateEventSeeds(
     startJD,
     endJD,
-    VERNAL_EQUINOX_2000_JD,
-    TROPICAL_YEAR_DAYS,
+    EARTH.SEASONAL_EVENTS.VERNAL_EQUINOX_2000,
+    EARTH.ORBIT.TROPICAL_YEAR,
     5, // 5-day convergence window to ensure all events are captured
   );
 

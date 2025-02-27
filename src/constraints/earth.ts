@@ -7,8 +7,10 @@ import { JULIAN_EPOCH_J2000 } from "./time";
 import {
   Days,
   Degrees,
+  DegreesPerCentury,
   DegreesPerCenturySquared,
   DegreesPerDay,
+  JulianDay,
 } from "./types";
 
 /** =============== Earth Orientation and Orbital Parameters ================ */
@@ -19,12 +21,47 @@ import {
  */
 export const EARTH = {
   /**
+   * Seasonal astronomical events reference points
+   * @constant {Object}
+   * @memberof EARTH
+   * @property {JulianDay} VERNAL_EQUINOX_2000 - Julian Day Number for the March equinox in J2000 epoch (2000-03-20 07:35 UT)
+   */
+  SEASONAL_EVENTS: {
+    VERNAL_EQUINOX_2000: 2451630.306 as JulianDay,
+  },
+
+  /**
    * The obliquity of the ecliptic at the J2000 epoch.
    * @constant {Degrees}
    * @unit degrees
    * @description The angle between Earth's equatorial plane and the ecliptic plane.
    */
   OBLIQUITY_J2000: 23.4392911 as Degrees, // IAU 2006 value in degrees
+
+  /**
+   * Parameters for long-term variations in Earth's axial tilt (obliquity).
+   * @constant {Object}
+   */
+  OBLIQUITY_DRIFT: {
+    /**
+     * Linear drift rate of Earth's obliquity.
+     * @constant {DegreesPerCentury}
+     * @unit degrees/century
+     * @description Simplified linear approximation of the decreasing obliquity over time.
+     * @note For high-precision long-term calculations, use a polynomial model.
+     * Based on modern estimates of ~-0.013° per century (J. Laskar 1986 estimation).
+     */
+    LINEAR_RATE: -0.013 as DegreesPerCentury,
+
+    /**
+     * Reference period for the linear drift rate.
+     * @constant {JulianDay}
+     * @unit Julian Day
+     * @description The J2000 epoch serves as the reference point for this linear model.
+     * @see JULIAN_EPOCH_J2000
+     */
+    REFERENCE_EPOCH: JULIAN_EPOCH_J2000,
+  },
 
   /**
    * Parameters for Earth's perihelion.
@@ -101,20 +138,6 @@ export const SIDEREAL = {
 
     T_SQUARED_COEFF: 0.000387933 as DegreesPerCenturySquared,
     T_CUBED_DIVISOR: 38710000, // dimensionless divisor for T^3 term
-  },
-
-  /**
-   * General parameters for Earth's rotation.
-   * @constant {Object}
-   */
-  GENERAL: {
-    /**
-     * Earth's rotation rate.
-     * @constant {DegreesPerDay}
-     * @unit degrees/day
-     * @description Angular rotation rate per mean solar day (verified against IERS).
-     */
-    ROTATION_RATE: 360.9856235 as DegreesPerDay, // Degrees/day
   },
 };
 
@@ -193,3 +216,101 @@ export const REFRACTION = {
     DENOMINATOR_OFFSET: 5.11, // Unitless
   },
 };
+
+/** ======================= ΔT Polynomial Segments ======================== */
+
+/**
+ * Configuration for ΔT (TT - UTC) polynomial approximations.
+ * @typedef {Object} DeltaTPolynomialSegment
+ * @property {number} maxYear - Upper year bound (exclusive).
+ * @property {number} base - Reference year for polynomial calculation.
+ * @property {number} scale - Year normalization divisor.
+ * @property {number[]} coeffs - Polynomial coefficients [a₀, a₁t, a₂t²,...].
+ */
+export type DeltaTPolynomialSegment = {
+  maxYear: number;
+  base: number;
+  scale: number;
+  coeffs: number[]; // Unitless coefficients
+};
+
+/**
+ * Polynomial segments for ΔT approximation by historical period.
+ * @constant {DeltaTPolynomialSegment[]}
+ * @description
+ * These segments provide polynomial approximations for ΔT (TT - UTC) over different historical periods.
+ * The coefficients are used to compute ΔT in seconds for a given year.
+ * @example
+ * For a year y in a segment, ΔT ≈ a₀ + a₁*(y - base)/scale + a₂*((y - base)/scale)^2 + ...
+ */
+export const DELTA_T_POLYNOMIAL_SEGMENTS: DeltaTPolynomialSegment[] = [
+  { maxYear: -500, base: 1820, scale: 100, coeffs: [-20, 0, 32] },
+  {
+    maxYear: 500,
+    base: 0,
+    scale: 100,
+    coeffs: [10583.6, -1014.41, 33.78311, -5.952053],
+  },
+  {
+    maxYear: 1600,
+    base: 1000,
+    scale: 100,
+    coeffs: [1574.2, -556.01, 71.23472, 0.319781],
+  },
+  {
+    maxYear: 1700,
+    base: 1600,
+    scale: 1,
+    coeffs: [120, -0.9808, -0.01532, 1 / 7129],
+  },
+  {
+    maxYear: 1800,
+    base: 1700,
+    scale: 1,
+    coeffs: [8.83, 0.1603, -0.0059285, 0.00013336],
+  },
+  {
+    maxYear: 1860,
+    base: 1800,
+    scale: 1,
+    coeffs: [13.72, -0.332447, 0.0068612, 0.0041116],
+  },
+  {
+    maxYear: 1900,
+    base: 1860,
+    scale: 1,
+    coeffs: [7.62, 0.5737, -0.251754, 0.01680668],
+  },
+  {
+    maxYear: 1920,
+    base: 1900,
+    scale: 1,
+    coeffs: [-2.79, 1.494119, -0.0598939, 0.0061966],
+  },
+  {
+    maxYear: 1941,
+    base: 1920,
+    scale: 1,
+    coeffs: [21.2, 0.84493, -0.0761, 0.0020936],
+  },
+  {
+    maxYear: 1961,
+    base: 1950,
+    scale: 1,
+    coeffs: [29.07, 0.407, -1 / 233, 1 / 2547],
+  },
+  {
+    maxYear: 1986,
+    base: 1975,
+    scale: 1,
+    coeffs: [45.45, 1.067, -1 / 260, -1 / 718],
+  },
+  {
+    maxYear: 2005,
+    base: 2000,
+    scale: 1,
+    coeffs: [63.86, 0.3345, -0.060374, 0.0017275],
+  },
+  { maxYear: 2050, base: 2000, scale: 1, coeffs: [62.92, 0.32217, 0.005589] },
+  { maxYear: Infinity, base: 2020, scale: 1, coeffs: [71.0, 0.3875, 0.00325] },
+];

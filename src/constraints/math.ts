@@ -35,6 +35,14 @@ export const DEGREES_TO_RADIANS = PI / 180; // Unitless
  */
 export const FULL_CIRCLE_DEGREES: Degrees = 360 as Degrees;
 
+/**
+ * Conversion factor from AU to KM.
+ * @constant {number}
+ * @unit unitless
+ * @example 1 AU to kilometers
+ */
+export const AU_TO_KM = 149597870.7;
+
 /** =========== Numerical Stability and Calculation Parameters =========== */
 
 /**
@@ -168,6 +176,20 @@ export const EVENT_THRESHOLDS = {
    * @unit days
    */
   SEASONAL_SEARCH_WINDOW_DAYS: 91 as Days,
+
+  /**
+   * Temporal window for event detection.
+   * @constant {Object}
+   */
+  WINDOW: {
+    /**
+     * Default search window for general event detection.
+     * @constant {Days}
+     * @unit days
+     * @description ~2 hour window (0.083 days ≈ 120 minutes)
+     */
+    DEFAULT: 0.083 as Days,
+  },
 };
 
 /**

@@ -5,7 +5,8 @@
   All temporal parameters and results are in Terrestrial Time (TT) Julian days.
 */
 
-import { DEGREES_TO_RADIANS, PI } from "./constraints/math";
+import { LUNAR } from "./constraints/lunar"; // Import lunar constants
+import { AU_TO_KM, DEGREES_TO_RADIANS, PI } from "./constraints/math";
 import { JULIAN_EPOCH_J2000 } from "./constraints/time";
 import { calculateLunarCoordinates } from "./mooncoords";
 import { sunCoords } from "./suncalc";
@@ -99,9 +100,11 @@ export function getMoonPosition(
   // Calculate mean anomaly (M) and distance (dist)
   const M =
     DEGREES_TO_RADIANS *
-    (LUNAR_J2000.MEAN_ANOMALY + LUNAR_DAILY_MOTION.ANOMALY * d);
-  const dist =
-    LUNAR_DISTANCE.MEAN - LUNAR_DISTANCE.VARIATION_COEFF * Math.cos(M);
+    (LUNAR.EPOCH_J2000.MEAN_ANOMALY + LUNAR.MOTION.ANOMALY * d);
+  const meanDist = LUNAR.ORBIT.SEMI_MAJOR_AXIS * AU_TO_KM; // Convert AU to km
+  const variationCoeff =
+    LUNAR.PERTURBATIONS.EVECTION_LONGITUDE_AMPLITUDE * meanDist; // Approximate variation
+  const dist = meanDist - variationCoeff * Math.cos(M);
 
   const H = siderealTime(d, lw) - ra;
   let h = altitude(H, phi, dec);
@@ -137,11 +140,13 @@ export function getMoonIllumination(jd: number): MoonIlluminationData {
   // Calculate mean anomaly (M) and distance (dist) for the moon
   const M =
     DEGREES_TO_RADIANS *
-    (LUNAR_J2000.MEAN_ANOMALY + LUNAR_DAILY_MOTION.ANOMALY * d);
-  const mDist =
-    LUNAR_DISTANCE.MEAN - LUNAR_DISTANCE.VARIATION_COEFF * Math.cos(M);
+    (LUNAR.EPOCH_J2000.MEAN_ANOMALY + LUNAR.MOTION.ANOMALY * d);
+  const meanDist = LUNAR.ORBIT.SEMI_MAJOR_AXIS * AU_TO_KM; // Convert AU to km
+  const variationCoeff =
+    LUNAR.PERTURBATIONS.EVECTION_LONGITUDE_AMPLITUDE * meanDist; // Approximate variation
+  const mDist = meanDist - variationCoeff * Math.cos(M);
 
-  const sdist = LUNAR_DISTANCE.MEAN; // Approximate sun distance (simplified)
+  const sdist = 1 * AU_TO_KM; // Sun distance: 1 AU in kilometers
   const phi = Math.acos(
     Math.sin(s.dec) * Math.sin(mDec) +
       Math.cos(s.dec) * Math.cos(mDec) * Math.cos(s.ra - mRa),
@@ -175,11 +180,14 @@ export function getMoonTimes(
   lat: number,
   lng: number,
 ): MoonTimesData {
-  const hc = MOON_VISIBILITY_ALTITUDE_DEG * DEGREES_TO_RADIANS; // Altitude threshold
+  const hc = LUNAR.VISIBILITY.ALTITUDE_THRESHOLD * DEGREES_TO_RADIANS; // Altitude threshold in radians
 
   let previousAlt = getMoonPosition(startJD, lat, lng).altitude - hc;
   let rise: number | undefined, set: number | undefined;
   let extremumSign = 0;
+
+  const HOURS_IN_DAY = 24; // Define constant for clarity
+  const HALF_DAY = 12;
 
   for (let hour = 0; hour < HOURS_IN_DAY; hour++) {
     const currentTime = startJD + hour / HOURS_IN_DAY;

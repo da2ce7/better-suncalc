@@ -3,7 +3,7 @@
  * @description Constants related to the Moon's orbital and positional parameters.
  */
 
-import { AU, Degrees, DegreesPerDay } from "./types";
+import { AU, Days, Degrees, DegreesPerDay, JulianDay } from "./types";
 
 /**
  * Constants related to the Moon's orbital and positional parameters.
@@ -127,5 +127,27 @@ export const LUNAR = {
      * Typical value is approximately 1.274 degrees.
      */
     EVECTION_LONGITUDE_AMPLITUDE: 1.274 as Degrees, // Degrees
+  },
+
+  /**
+   * Parameters related to lunar phases.
+   * @constant {Object}
+   */
+  PHASES: {
+    /**
+     * The average length of a synodic month.
+     * @constant {Days}
+     * @unit days
+     * @description The time between consecutive new moons.
+     */
+    SYNODIC_MONTH: 29.530588853 as Days,
+
+    /**
+     * Reference Julian Day for a known new moon.
+     * @constant {JulianDay}
+     * @unit Julian Day (TT)
+     * @description JD TT for 2000-01-06 18:14:00, a known new moon.
+     */
+    REFERENCE_NEW_MOON: 2451549.2590277777 as JulianDay,
   },
 };

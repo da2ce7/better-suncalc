@@ -5,7 +5,14 @@
  * All time-based inputs and outputs are in JD TT (Terrestrial Time) unless otherwise stated.
  */
 
-import { DEGREES_TO_RADIANS, PI, TAU } from "./constraints/math";
+import {
+  DEGREES_TO_RADIANS,
+  NUMERICAL,
+  PI,
+  SOLAR_EVENT_DEFINITIONS,
+  TAU,
+} from "./constraints/math";
+import { HALF_DAY } from "./constraints/time";
 import { calculateSolarCoordinates } from "./suncoords";
 import { getClosestTransitCycle } from "./transits";
 import {
@@ -50,12 +57,12 @@ export function sunCoords(jd_tt: number): { ra: number; dec: number } {
 /**
  * Calculates the rate of change of solar declination for transit time correction.
  * @param {number} jd_tt - Julian day in TT.
- * @param {number} [delta=NUMERICAL_DERIVATIVE_STEP_DAYS] - Finite difference step size in days.
+ * @param {number} [delta=NUMERICAL.CALCULATION.DERIVATIVE_STEP_DAYS] - Finite difference step size in days.
  * @returns {number} Declination rate in radians per day.
  */
 export function solarDeclinationRate(
   jd_tt: number,
-  delta: number = NUMERICAL_DERIVATIVE_STEP_DAYS,
+  delta: number = NUMERICAL.CALCULATION.DERIVATIVE_STEP_DAYS,
 ): number {
   const sunCoordsDecFn = (t: number) => sunCoords(t).dec;
   return computeDerivative(sunCoordsDecFn, jd_tt, delta);
