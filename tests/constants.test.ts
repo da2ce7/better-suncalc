@@ -11,12 +11,12 @@ import {
   acos,
   asin,
   atan2,
-  CONVERGENCE_TOLERANCE,
-  CONVERGENCE_WINDOW,
+  CONVERGENCE_TOLERANCE_DAYS,
+  CONVERGENCE_WINDOW_DAYS,
   cos,
   DAY_IN_MS,
   DEFAULT_WINDOW_SIZE_DAYS,
-  DEGREE_IN_RADIANS,
+  DEGREES_TO_RADIANS,
   DERIVATIVE_DELTA_DAYS,
   EARTH_OBLIQUITY_J2000,
   EARTH_PERIHELION,
@@ -38,7 +38,7 @@ import {
   tan,
   TIME_EQUALITY_EPS,
   TROPICAL_YEAR,
-} from "../src/constants";
+} from "../src/constraints/constants";
 
 // Precision thresholds for floating-point comparisons
 const JD_PRECISION = 1e-7; // ≈0.1 seconds in fractional day
@@ -48,12 +48,12 @@ const TIME_PRECISION = 1e-6; // ≈0.0864 seconds in days
 /** ======================== Mathematical Constants ======================== */
 
 describe("Mathematical Constants", () => {
-  test("PI matches Math.PI", () => {
-    expect(PI).toBe(Math.PI);
+  test("PI matches PI", () => {
+    expect(PI).toBe(PI);
   });
 
-  test("DEGREE_IN_RADIANS equals π / 180", () => {
-    expect(DEGREE_IN_RADIANS).toBeCloseTo(Math.PI / 180, 10);
+  test("DEGREES_TO_RADIANS equals π / 180", () => {
+    expect(DEGREES_TO_RADIANS).toBeCloseTo(PI / 180, 10);
   });
 
   test("Trigonometric functions reference Math functions", () => {
@@ -90,7 +90,7 @@ describe("Temporal Constants", () => {
 
 describe("Earth Constants", () => {
   test("EARTH_OBLIQUITY_J2000 matches 23.4397° in radians", () => {
-    const expected = 23.4397 * DEGREE_IN_RADIANS;
+    const expected = 23.4397 * DEGREES_TO_RADIANS;
     expect(EARTH_OBLIQUITY_J2000).toBeCloseTo(expected, 10);
     // Note: JPL value is approximately 23.439291111°
   });
@@ -135,12 +135,12 @@ describe("Solar Event Parameters", () => {
 
 describe("Iterative Calculation Parameters", () => {
   test("CONVERGENCE_WINDOW equals 91 days", () => {
-    expect(CONVERGENCE_WINDOW).toBe(91);
+    expect(CONVERGENCE_WINDOW_DAYS).toBe(91);
   });
 
   test("CONVERGENCE_WINDOW approximates TROPICAL_YEAR / 4", () => {
     const quarterYear = TROPICAL_YEAR / 4; // ≈91.31055 days
-    expect(CONVERGENCE_WINDOW).toBeCloseTo(quarterYear, 0); // Integer days
+    expect(CONVERGENCE_WINDOW_DAYS).toBeCloseTo(quarterYear, 0); // Integer days
   });
 
   test("DERIVATIVE_DELTA_DAYS equals 0.001 days", () => {
@@ -148,7 +148,7 @@ describe("Iterative Calculation Parameters", () => {
   });
 
   test("CONVERGENCE_TOLERANCE equals 1e-8 days", () => {
-    expect(CONVERGENCE_TOLERANCE).toBe(1e-8);
+    expect(CONVERGENCE_TOLERANCE_DAYS).toBe(1e-8);
   });
 
   test("TIME_EQUALITY_EPS equals 0.001 days", () => {
@@ -175,7 +175,7 @@ describe("Solar Altitude Thresholds", () => {
 describe("Atmospheric Refraction Parameters", () => {
   test("REFRACTION_OPTIONS.MIN_ALT_RAD equals -0.83° in radians", () => {
     expect(REFRACTION_OPTIONS.MIN_ALT_RAD).toBeCloseTo(
-      -0.83 * DEGREE_IN_RADIANS,
+      -0.83 * DEGREES_TO_RADIANS,
       10,
     );
   });

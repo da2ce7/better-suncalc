@@ -27,7 +27,7 @@ var sunriseStr = times.sunrise.getHours() + ":" + times.sunrise.getMinutes();
 var sunrisePos = SunCalc.getPosition(times.sunrise, 51.5, -0.1);
 
 // get sunrise azimuth in degrees
-var sunriseAzimuth = (sunrisePos.azimuth * 180) / Math.PI;
+var sunriseAzimuth = (sunrisePos.azimuth * 180) / PI;
 ```
 
 SunCalc is also available as an NPM package:
@@ -94,7 +94,7 @@ Returns an object with the following properties:
 - `altitude`: sun altitude above the horizon in radians,
   e.g. `0` at the horizon and `PI/2` at the zenith (straight over your head)
 - `azimuth`: sun azimuth in radians (direction along the horizon, measured from south to west),
-  e.g. `0` is south and `Math.PI * 3/4` is northwest
+  e.g. `0` is south and `PI * 3/4` is northwest
 
 ### Moon position
 

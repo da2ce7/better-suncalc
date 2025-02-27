@@ -18,7 +18,7 @@
 	"types": "./dist/index.d.ts",
 	"type": "module",
 	"scripts": {
-		"build": "tsc && webpack --mode development",
+		"build": "yarn run build:dev",
 		"postbuild": "rm -rf dist/*.js dist/*.map",
 		"build:dev": "tsc && webpack --mode development",
 		"build:prod": "tsc && webpack --mode production",

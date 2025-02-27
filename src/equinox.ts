@@ -1,81 +1,32 @@
 /**
  * equinox.ts
  *
- * Equinox calculations: Finds March/September equinoxes (zero solar declination)
- * @warning Accuracy declines beyond ±10,000 years due to orbital model J2000 assumptions!
+ * Equinox calculations: Finds March and September equinoxes using solar phases.
+ * - Phase 0.0 corresponds to the March equinox (start of astronomical spring, Northern Hemisphere).
+ * - Phase 0.5 corresponds to the September equinox (start of astronomical autumn, Northern Hemisphere).
+ *
+ * @warning Accuracy may degrade over very long time spans (e.g., ±10,000 years) due to variations in Earth's orbit.
  */
 
-import {
-  CONVERGENCE_WINDOW,
-  J2000,
-  REFERENCE_EQUINOX_JD,
-  TROPICAL_YEAR,
-} from "./constants";
-import { sunCoords } from "./suncalc";
-import {
-  addUniqueJD,
-  generateEventSeeds,
-  refineEvent,
-  solarDeclinationRate as utilSolarDeclinationRate,
-} from "./utils";
+import { getSunPhases } from "./sunphase";
 
 export type EquinoxData = {
-  vernal: number[]; // March equinoxes (northward declination)
-  autumnal: number[]; // September equinoxes (southward declination)
+  vernal: number[]; // March equinoxes as Julian days
+  september: number[]; // September equinoxes as Julian days
 };
 
 /**
- * Calculate equinoxes within a date range
- * @param startJD Start Julian day
- * @param endJD End Julian day
- * @returns Object with equinox JDs sorted ascending
+ * Calculate equinoxes within a date range using solar phases.
+ * @param startJD Start Julian day (Terrestrial Time, TT)
+ * @param endJD End Julian day (Terrestrial Time, TT)
+ * @returns Object with March and September equinox JDs, sorted in ascending order
  */
 export function getEquinoxes(startJD: number, endJD: number): EquinoxData {
-  if (startJD > endJD) [startJD, endJD] = [endJD, startJD];
+  // Calculate March equinoxes at phase 0.0
+  const vernal = getSunPhases(startJD, endJD, 0.0);
 
-  // Generate seeds at half-year intervals from reference equinox
-  const seeds = generateEventSeeds(
-    startJD,
-    endJD,
-    REFERENCE_EQUINOX_JD,
-    0.5 * TROPICAL_YEAR,
-    CONVERGENCE_WINDOW,
-  );
+  // Calculate September equinoxes at phase 0.5
+  const september = getSunPhases(startJD, endJD, 0.5);
 
-  return validateEquinoxes(seeds, startJD, endJD);
-}
-
-/**
- * Refines seeds into equinox JDs, classifying by declination slope
- */
-function validateEquinoxes(
-  seeds: number[],
-  startJD: number,
-  endJD: number,
-): EquinoxData {
-  const data: EquinoxData = { vernal: [], autumnal: [] };
-
-  const declinationRate = (t: number) =>
-    utilSolarDeclinationRate((innerT) => sunCoords(innerT).dec, t);
-
-  for (const jdApprox of seeds) {
-    const t = jdApprox - J2000;
-
-    // Refine to declination = 0 with NR
-    const refinedJD = refineEvent(t, (t) => sunCoords(t).dec, 0) + J2000;
-
-    if (refinedJD < startJD || refinedJD > endJD) continue;
-
-    // Check declination rate to distinguish vernal (positive rate) vs autumnal
-    const rate = declinationRate(refinedJD - J2000);
-    if (rate > 0) {
-      addUniqueJD(data.vernal, refinedJD); // Heading north -> March equinox
-    } else {
-      addUniqueJD(data.autumnal, refinedJD);
-    }
-  }
-
-  data.vernal.sort((a, b) => a - b);
-  data.autumnal.sort((a, b) => a - b);
-  return data;
+  return { vernal, september };
 }

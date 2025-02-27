@@ -1,4 +1,4 @@
-import { J2000 } from "../src/constants";
+import { J2000 } from "../src/constraints/constants";
 import {
   getMoonIllumination,
   getMoonPosition,
