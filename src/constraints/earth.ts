@@ -4,7 +4,12 @@
  */
 
 import { JULIAN_EPOCH_J2000 } from "./time";
-import { Days, Degrees, DegreesPerDay } from "./types";
+import {
+  Days,
+  Degrees,
+  DegreesPerCenturySquared,
+  DegreesPerDay,
+} from "./types";
 
 /** =============== Earth Orientation and Orbital Parameters ================ */
 
@@ -93,6 +98,9 @@ export const SIDEREAL = {
      * @description Rate of change of sidereal time per solar day.
      */
     DRIFT_RATE: 360.98564736628 as DegreesPerDay, // Degrees/day
+
+    T_SQUARED_COEFF: 0.000387933 as DegreesPerCenturySquared,
+    T_CUBED_DIVISOR: 38710000, // dimensionless divisor for T^3 term
   },
 
   /**

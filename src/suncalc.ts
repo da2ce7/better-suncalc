@@ -5,11 +5,6 @@
  * All time-based inputs and outputs are in JD TT (Terrestrial Time) unless otherwise stated.
  */
 
-import {
-  HALF_DAY,
-  NUMERICAL_DERIVATIVE_STEP_DAYS,
-  SOLAR_EVENT_DEFINITIONS,
-} from "./constraints/constants";
 import { DEGREES_TO_RADIANS, PI, TAU } from "./constraints/math";
 import { calculateSolarCoordinates } from "./suncoords";
 import { getClosestTransitCycle } from "./transits";

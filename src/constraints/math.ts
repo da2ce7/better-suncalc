@@ -29,6 +29,12 @@ export const TAU = 2 * PI; // Unitless
  */
 export const DEGREES_TO_RADIANS = PI / 180; // Unitless
 
+/**
+ * Full circle in degrees.
+ * @unit degrees
+ */
+export const FULL_CIRCLE_DEGREES: Degrees = 360 as Degrees;
+
 /** =========== Numerical Stability and Calculation Parameters =========== */
 
 /**

@@ -5,15 +5,13 @@
  * Valid for ±200 years around J2000 (~1800-2200), ~0.01° accuracy in declination.
  */
 
-import {
-  EARTH_ORBIT_ECCENTRICITY,
-  JULIAN_EPOCH_J2000,
-  MEAN_ANOMALY_DRIFT_PER_CENTURY,
-  MEAN_ANOMALY_EPOCH_DEGREES,
-  SOLAR_EQUATION_OF_CENTER_COEFFS,
-  SOLAR_MEAN_LONGITUDE,
-} from "./constraints/constants";
+import { EARTH } from "./constraints/earth";
 import { DEGREES_TO_RADIANS } from "./constraints/math";
+import { SOLAR } from "./constraints/solar";
+import {
+  DAYS_PER_JULIAN_CENTURY,
+  JULIAN_EPOCH_J2000,
+} from "./constraints/time";
 import {
   calculateTrueObliquity,
   CelestialCoordinates,
@@ -40,7 +38,7 @@ export function calculateSolarCoordinates(jd_tt: number): CelestialCoordinates {
   const epsilon = calculateTrueObliquity(T);
   const ra = rightAscension(eclipticLon, 0, epsilon);
   const dec = declination(eclipticLon, 0, epsilon);
-  const distance = 1 - EARTH_ORBIT_ECCENTRICITY * Math.cos(M); // Distance in AU
+  const distance = 1 - EARTH.ORBIT.ECCENTRICITY * Math.cos(M); // Distance in AU
 
   return { ra, dec, distance, eclipticLon, eclipticLat: 0 };
 }
@@ -54,10 +52,12 @@ export function calculateSolarCoordinates(jd_tt: number): CelestialCoordinates {
  */
 export function solarMeanAnomaly(jd_tt: number): number {
   const T = getJulianCenturiesSinceJ2000(jd_tt);
-  return (
-    (MEAN_ANOMALY_EPOCH_DEGREES + MEAN_ANOMALY_DRIFT_PER_CENTURY * T) *
-    DEGREES_TO_RADIANS
-  );
+  const M_deg =
+    SOLAR.EPOCH_J2000.MEAN_ANOMALY +
+    SOLAR.MOTION.ANOMALY * DAYS_PER_JULIAN_CENTURY * T;
+  let M_deg_normalized = M_deg % 360;
+  if (M_deg_normalized < 0) M_deg_normalized += 360; // Ensure [0, 360)
+  return M_deg_normalized * DEGREES_TO_RADIANS;
 }
 
 /**
@@ -67,14 +67,14 @@ export function solarMeanAnomaly(jd_tt: number): number {
  */
 export function eclipticLongitude(jd_tt: number): number {
   const d = jd_tt - JULIAN_EPOCH_J2000;
-  const L =
-    (SOLAR_MEAN_LONGITUDE.OFFSET_DEG +
-      SOLAR_MEAN_LONGITUDE.RATE_DEG_PER_DAY * d) %
-    360;
+  let L = (SOLAR.EPOCH_J2000.MEAN_LONGITUDE + SOLAR.MOTION.LONGITUDE * d) % 360;
+  if (L < 0) L += 360; // Ensure [0, 360)
   const M = solarMeanAnomaly(jd_tt);
   const C =
-    SOLAR_EQUATION_OF_CENTER_COEFFS[0] * Math.sin(M) +
-    SOLAR_EQUATION_OF_CENTER_COEFFS[1] * Math.sin(2 * M) +
-    SOLAR_EQUATION_OF_CENTER_COEFFS[2] * Math.sin(3 * M);
-  return ((L + C) % 360) * DEGREES_TO_RADIANS;
+    SOLAR.EQUATION_OF_CENTER[0] * Math.sin(M) +
+    SOLAR.EQUATION_OF_CENTER[1] * Math.sin(2 * M) +
+    SOLAR.EQUATION_OF_CENTER[2] * Math.sin(3 * M);
+  let trueLongitude = (L + C) % 360;
+  if (trueLongitude < 0) trueLongitude += 360; // Ensure [0, 360)
+  return trueLongitude * DEGREES_TO_RADIANS;
 }

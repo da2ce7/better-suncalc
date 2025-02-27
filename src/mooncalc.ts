@@ -5,16 +5,8 @@
   All temporal parameters and results are in Terrestrial Time (TT) Julian days.
 */
 
-import {
-  HALF_DAY,
-  HOURS_IN_DAY,
-  JULIAN_EPOCH_J2000,
-  LUNAR_DAILY_MOTION,
-  LUNAR_DISTANCE,
-  LUNAR_J2000,
-  MOON_VISIBILITY_ALTITUDE_DEG,
-} from "./constraints/constants";
 import { DEGREES_TO_RADIANS, PI } from "./constraints/math";
+import { JULIAN_EPOCH_J2000 } from "./constraints/time";
 import { calculateLunarCoordinates } from "./mooncoords";
 import { sunCoords } from "./suncalc";
 import {

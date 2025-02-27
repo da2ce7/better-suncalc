@@ -7,11 +7,6 @@
  * @warning Accuracy may degrade over very long time spans due to perturbations in the moon's orbit.
  */
 
-import {
-  JULIAN_EPOCH_J2000,
-  REFERENCE_NEW_MOON_JD,
-  SYNODIC_MONTH_DAYS,
-} from "./constraints/constants";
 import { getMoonIllumination } from "./mooncalc";
 import { addUniqueJD, generateEventSeeds, refineEvent } from "./utils";
 

@@ -113,4 +113,19 @@ export const LUNAR = {
      */
     ALTITUDE_THRESHOLD: 0.625 as Degrees, // Degrees (refraction + semi-diameter)
   },
+
+  /**
+   * Parameters for lunar perturbations.
+   * @constant {Object}
+   */
+  PERTURBATIONS: {
+    /**
+     * Amplitude of the evection term in lunar longitude.
+     * @constant {Degrees}
+     * @unit degrees
+     * @description The largest periodic perturbation in the Moon's longitude, caused by the Sun's gravity.
+     * Typical value is approximately 1.274 degrees.
+     */
+    EVECTION_LONGITUDE_AMPLITUDE: 1.274 as Degrees, // Degrees
+  },
 };

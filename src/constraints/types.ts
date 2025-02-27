@@ -40,6 +40,13 @@ export type Hours = number & { readonly __brand: "Hours" };
 export type JulianDay = number & { readonly __brand: "JulianDay" };
 
 /**
+ * Represents a rate of change in degrees per century squared.
+ */
+export type DegreesPerCenturySquared = number & {
+  readonly __brand: "DegreesPerCenturySquared";
+};
+
+/**
  * Represents a distance in astronomical units (AU).
  * @typedef {number & { readonly __brand: "AU" }} AU
  */

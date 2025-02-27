@@ -14,15 +14,25 @@
  *   calculations (Meeus Ch. 12, 13).
  * - **Precision Refinement**: Employs root-finding via {@link refineEvent}
  *   to pinpoint exact transit times when H = 0 (meridian crossing).
- *  *
+ *
  * @module transits
  * @see {@link https://www.willbell.com/math/mc1.htm Meeus, Astronomical Algorithms} - Core logic for GMST and transit approximation.
  * @see {@link jd_tt} Time scale conversions.
  * @see {@link utils.refineEvent} Root-finding implementation.
- *
  */
 
-import { DEGREES_TO_RADIANS, PI, TAU } from "./constraints/math";
+import { SIDEREAL } from "./constraints/earth";
+import {
+  DEGREES_TO_RADIANS,
+  FULL_CIRCLE_DEGREES,
+  PI,
+  TAU,
+} from "./constraints/math";
+import {
+  DAYS_PER_JULIAN_CENTURY,
+  HALF_DAY,
+  JULIAN_EPOCH_J2000,
+} from "./constraints/time";
 import { ttToUT1 } from "./terrestrialtime";
 import { CelestialCoordinates, refineEvent } from "./utils";
 
@@ -67,17 +77,16 @@ export function approximateLocalJulianDay(
  * @see {@link ttToUT1} for TT to UT1 conversion.
  */
 function getGSTRadians(jdTT: number): number {
-  const jdUT1 = ttToUT1(jdTT); // Convert TT to UT1
-  const T = (jdUT1 - JULIAN_EPOCH_J2000) / DAYS_PER_JULIAN_CENTURY; // Julian centuries since J2000
+  const jdUT1 = ttToUT1(jdTT); // Assume this converts TT to UT1
+  const T = (jdUT1 - JULIAN_EPOCH_J2000) / DAYS_PER_JULIAN_CENTURY;
 
-  // Meeus' approximation for GMST in degrees
   let gmstDegrees =
-    GMST_COEFF_DEGREES +
-    DAILY_DRIFT_DEGREES_PER_DAY * (jdUT1 - JULIAN_EPOCH_J2000) +
-    T_SQUARED_COEFF_DEGREES * Math.pow(T, 2) -
-    Math.pow(T, 3) / T_CUBED_DIVISOR;
+    SIDEREAL.GMST.BASE +
+    SIDEREAL.GMST.DRIFT_RATE * (jdUT1 - JULIAN_EPOCH_J2000) +
+    SIDEREAL.GMST.T_SQUARED_COEFF * Math.pow(T, 2) -
+    Math.pow(T, 3) / SIDEREAL.GMST.T_CUBED_DIVISOR;
 
-  // Normalize to [0°, 360°)
+  // Normalize to [0, 360) degrees
   gmstDegrees =
     ((gmstDegrees % FULL_CIRCLE_DEGREES) + FULL_CIRCLE_DEGREES) %
     FULL_CIRCLE_DEGREES;

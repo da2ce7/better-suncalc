@@ -11,12 +11,8 @@
  * @warning Accuracy may degrade over very long time spans due to variations in Earth's orbit.
  */
 
-import {
-  JULIAN_EPOCH_J2000,
-  TROPICAL_YEAR_DAYS,
-  VERNAL_EQUINOX_2000_JD,
-} from "./constraints/constants";
 import { PI, TAU } from "./constraints/math";
+import { JULIAN_EPOCH_J2000 } from "./constraints/time";
 import { eclipticLongitude, solarMeanAnomaly } from "./suncoords";
 import { addUniqueJD, generateEventSeeds, refineEvent } from "./utils";
 
