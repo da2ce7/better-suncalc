@@ -26,7 +26,9 @@
 		"suncalc",
 		"suncoords",
 		"sunphase",
+		"terrestrialtime",
 		"timestep",
+		"Unitless",
 		"USNO"
 	],
 	"enableFiletypes": [

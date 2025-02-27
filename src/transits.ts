@@ -22,18 +22,8 @@
  *
  */
 
-import {
-  DAILY_DRIFT_DEGREES_PER_DAY,
-  DAYS_PER_JULIAN_CENTURY,
-  FULL_CIRCLE_DEGREES,
-  GMST_COEFF_DEGREES,
-  HALF_DAY,
-  JULIAN_EPOCH_J2000,
-  T_CUBED_DIVISOR,
-  T_SQUARED_COEFF_DEGREES,
-} from "./constraints/constants";
 import { DEGREES_TO_RADIANS, PI, TAU } from "./constraints/math";
-import { ttToUT1 } from "./jd_tt";
+import { ttToUT1 } from "./terrestrialtime";
 import { CelestialCoordinates, refineEvent } from "./utils";
 
 export type PreciseTransitData = {

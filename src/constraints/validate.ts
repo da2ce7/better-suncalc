@@ -4,7 +4,7 @@
 
 import { EARTH } from "./earth";
 import { LUNAR } from "./lunar";
-import { SOLAR } from "./sol";
+import { SOLAR } from "./solar";
 
 // Verify key astronomical relationships
 console.assert(
