@@ -3,7 +3,7 @@
  * @description Constants related to the Sun's orbital and positional model.
  */
 
-import { Degrees, DegreesPerCentury, DegreesPerDay } from "./types";
+import { Degrees, DegreesPerDay, DegreesPerJ2000CenturyTT } from "./types";
 
 /**
  * Constants related to the Sun's orbital and positional model.
@@ -64,11 +64,11 @@ export const SOLAR = {
 
     /**
      * Centurial rate of change of the Sun's mean longitude.
-     * @constant {DegreesPerCentury}
+     * @constant {DegreesPerJ2000CenturyTT}
      * @unit degrees/century
      * @description Long-term motion per Julian century.
      */
-    LONGITUDE_CENTURIAL: 36000.76982779 as DegreesPerCentury, // Degrees per Julian century
+    LONGITUDE_CENTURIAL: 36000.76982779 as DegreesPerJ2000CenturyTT, // Degrees per Julian century
   },
 
   /**

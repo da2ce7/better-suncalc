@@ -7,10 +7,10 @@ import { JULIAN_EPOCH_J2000 } from "./time";
 import {
   Days,
   Degrees,
-  DegreesPerCentury,
-  DegreesPerCenturySquared,
   DegreesPerDay,
-  JulianDay,
+  DegreesPerJ2000CenturyTT,
+  DegreesPerJ2000CenturyTT_Squared,
+  JulianDayTT,
 } from "./types";
 
 /** =============== Earth Orientation and Orbital Parameters ================ */
@@ -27,7 +27,7 @@ export const EARTH = {
    * @property {JulianDay} VERNAL_EQUINOX_2000 - Julian Day Number for the March equinox in J2000 epoch (2000-03-20 07:35 UT)
    */
   SEASONAL_EVENTS: {
-    VERNAL_EQUINOX_2000: 2451630.306 as JulianDay,
+    VERNAL_EQUINOX_2000: 2451630.306 as JulianDayTT,
   },
 
   /**
@@ -45,13 +45,13 @@ export const EARTH = {
   OBLIQUITY_DRIFT: {
     /**
      * Linear drift rate of Earth's obliquity.
-     * @constant {DegreesPerCentury}
+     * @constant {DegreesPerJ2000CenturyTT}
      * @unit degrees/century
      * @description Simplified linear approximation of the decreasing obliquity over time.
      * @note For high-precision long-term calculations, use a polynomial model.
      * Based on modern estimates of ~-0.013° per century (J. Laskar 1986 estimation).
      */
-    LINEAR_RATE: -0.013 as DegreesPerCentury,
+    LINEAR_RATE: -0.013 as DegreesPerJ2000CenturyTT,
 
     /**
      * Reference period for the linear drift rate.
@@ -136,7 +136,7 @@ export const SIDEREAL = {
      */
     DRIFT_RATE: 360.98564736628 as DegreesPerDay, // Degrees/day
 
-    T_SQUARED_COEFF: 0.000387933 as DegreesPerCenturySquared,
+    T_SQUARED_COEFF: 0.000387933 as DegreesPerJ2000CenturyTT_Squared,
     T_CUBED_DIVISOR: 38710000, // dimensionless divisor for T^3 term
   },
 };

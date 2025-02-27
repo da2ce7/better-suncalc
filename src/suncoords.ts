@@ -1,4 +1,3 @@
-// suncoords.ts
 /**
  * @file suncoords.ts
  * @description Calculates the sun's celestial coordinates (RA/Dec and ecliptic longitude).
@@ -12,6 +11,14 @@ import {
   DAYS_PER_JULIAN_CENTURY,
   JULIAN_EPOCH_J2000,
 } from "./constraints/time";
+import {
+  AU,
+  Days,
+  Degrees,
+  J2000CenturyTT,
+  JulianDayTT,
+  Radians,
+} from "./constraints/types";
 import {
   calculateTrueObliquity,
   CelestialCoordinates,
@@ -27,54 +34,75 @@ import {
  * - Valid for ±200 years around J2000 (~1800-2200)
  * - ~0.01° accuracy in declination
  * - Distance approximated with r ≈ 1 - e * cos(M) in AU
- * @param {number} jd_tt - Julian day in Terrestrial Time (TT).
+ * @param {JulianDayTT} jd_tt - Julian day in Terrestrial Time (TT).
  * @returns {CelestialCoordinates} Object containing right ascension (ra), declination (dec),
  * ecliptic longitude (eclipticLon), ecliptic latitude (eclipticLat) in radians, and distance in AU.
  */
-export function calculateSolarCoordinates(jd_tt: number): CelestialCoordinates {
-  const T = getJulianCenturiesSinceJ2000(jd_tt);
-  const M = solarMeanAnomaly(jd_tt); // Mean anomaly in radians
-  const eclipticLon = eclipticLongitude(jd_tt);
-  const epsilon = calculateTrueObliquity(T);
-  const ra = rightAscension(eclipticLon, 0, epsilon);
-  const dec = declination(eclipticLon, 0, epsilon);
-  const distance = 1 - EARTH.ORBIT.ECCENTRICITY * Math.cos(M); // Distance in AU
+export function calculateSolarCoordinates(
+  jd_tt: JulianDayTT,
+): CelestialCoordinates {
+  const T: J2000CenturyTT = getJulianCenturiesSinceJ2000(jd_tt);
+  const M_rad: Radians = solarMeanAnomaly(jd_tt); // Mean anomaly in radians
+  const eclipticLon_rad: Radians = eclipticLongitude(jd_tt);
+  const epsilon_rad: Radians = calculateTrueObliquity(T);
+  const ra_rad: Radians = rightAscension(
+    eclipticLon_rad,
+    0 as Radians,
+    epsilon_rad,
+  );
+  const dec_rad: Radians = declination(
+    eclipticLon_rad,
+    0 as Radians,
+    epsilon_rad,
+  );
+  const distance: AU = (1 - EARTH.ORBIT.ECCENTRICITY * Math.cos(M_rad)) as AU; // Distance in AU
 
-  return { ra, dec, distance, eclipticLon, eclipticLat: 0 };
+  return {
+    ra: ra_rad,
+    dec: dec_rad,
+    distance,
+    eclipticLon: eclipticLon_rad,
+    eclipticLat: 0 as Radians,
+  };
 }
 
 /* ==================== Core Mathematical Functions ==================== */
 
 /**
  * Calculates the solar mean anomaly for a given Julian day.
- * @param {number} jd_tt - Julian day in Terrestrial Time (TT).
- * @returns {number} Solar mean anomaly in radians.
+ * @param {JulianDayTT} jd_tt - Julian day in Terrestrial Time (TT).
+ * @returns {Radians} Solar mean anomaly in radians.
  */
-export function solarMeanAnomaly(jd_tt: number): number {
-  const T = getJulianCenturiesSinceJ2000(jd_tt);
-  const M_deg =
-    SOLAR.EPOCH_J2000.MEAN_ANOMALY +
-    SOLAR.MOTION.ANOMALY * DAYS_PER_JULIAN_CENTURY * T;
-  let M_deg_normalized = M_deg % 360;
-  if (M_deg_normalized < 0) M_deg_normalized += 360; // Ensure [0, 360)
-  return M_deg_normalized * DEGREES_TO_RADIANS;
+export function solarMeanAnomaly(jd_tt: JulianDayTT): Radians {
+  const T: J2000CenturyTT = getJulianCenturiesSinceJ2000(jd_tt);
+  const meanAnomalyDeg: Degrees = (SOLAR.EPOCH_J2000.MEAN_ANOMALY +
+    SOLAR.MOTION.ANOMALY * (DAYS_PER_JULIAN_CENTURY as Days) * T) as Degrees;
+  let meanAnomalyDegNormalized: Degrees = (meanAnomalyDeg % 360) as Degrees;
+  if (meanAnomalyDegNormalized < 0) {
+    meanAnomalyDegNormalized = (meanAnomalyDegNormalized + 360) as Degrees; // Ensure [0, 360)
+  }
+  return (meanAnomalyDegNormalized * DEGREES_TO_RADIANS) as Radians;
 }
 
 /**
  * Calculates the ecliptic longitude of the sun for a given Julian day.
- * @param {number} jd_tt - Julian day in Terrestrial Time (TT).
- * @returns {number} Ecliptic longitude in radians.
+ * @param {JulianDayTT} jd_tt - Julian day in Terrestrial Time (TT).
+ * @returns {Radians} Ecliptic longitude in radians.
  */
-export function eclipticLongitude(jd_tt: number): number {
-  const d = jd_tt - JULIAN_EPOCH_J2000;
-  let L = (SOLAR.EPOCH_J2000.MEAN_LONGITUDE + SOLAR.MOTION.LONGITUDE * d) % 360;
-  if (L < 0) L += 360; // Ensure [0, 360)
-  const M = solarMeanAnomaly(jd_tt);
-  const C =
-    SOLAR.EQUATION_OF_CENTER[0] * Math.sin(M) +
-    SOLAR.EQUATION_OF_CENTER[1] * Math.sin(2 * M) +
-    SOLAR.EQUATION_OF_CENTER[2] * Math.sin(3 * M);
-  let trueLongitude = (L + C) % 360;
-  if (trueLongitude < 0) trueLongitude += 360; // Ensure [0, 360)
-  return trueLongitude * DEGREES_TO_RADIANS;
+export function eclipticLongitude(jd_tt: JulianDayTT): Radians {
+  const d: Days = (jd_tt - JULIAN_EPOCH_J2000) as Days;
+  let L_deg: Degrees = (SOLAR.EPOCH_J2000.MEAN_LONGITUDE +
+    SOLAR.MOTION.LONGITUDE * d) as Degrees;
+  L_deg = (L_deg % 360) as Degrees;
+  if (L_deg < 0) L_deg = (L_deg + 360) as Degrees; // Ensure [0, 360)
+  const M_rad: Radians = solarMeanAnomaly(jd_tt);
+  const C_deg: Degrees = (SOLAR.EQUATION_OF_CENTER[0] * Math.sin(M_rad) +
+    SOLAR.EQUATION_OF_CENTER[1] * Math.sin(2 * M_rad) +
+    SOLAR.EQUATION_OF_CENTER[2] * Math.sin(3 * M_rad)) as Degrees;
+  let trueLongitude_deg: Degrees = (L_deg + C_deg) as Degrees;
+  trueLongitude_deg = (trueLongitude_deg % 360) as Degrees;
+  if (trueLongitude_deg < 0) {
+    trueLongitude_deg = (trueLongitude_deg + 360) as Degrees; // Ensure [0, 360)
+  }
+  return (trueLongitude_deg * DEGREES_TO_RADIANS) as Radians;
 }

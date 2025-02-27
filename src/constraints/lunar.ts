@@ -3,7 +3,7 @@
  * @description Constants related to the Moon's orbital and positional parameters.
  */
 
-import { AU, Days, Degrees, DegreesPerDay, JulianDay } from "./types";
+import { AU, Days, Degrees, DegreesPerDay, JulianDayTT } from "./types";
 
 /**
  * Constants related to the Moon's orbital and positional parameters.
@@ -148,6 +148,6 @@ export const LUNAR = {
      * @unit Julian Day (TT)
      * @description JD TT for 2000-01-06 18:14:00, a known new moon.
      */
-    REFERENCE_NEW_MOON: 2451549.2590277777 as JulianDay,
+    REFERENCE_NEW_MOON: 2451549.2590277777 as JulianDayTT,
   },
 };

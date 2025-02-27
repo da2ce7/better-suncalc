@@ -3,7 +3,7 @@
  * @description Time-related constants, including epochs and ΔT polynomial segments.
  */
 
-import { Days, Hours, JulianDay, Milliseconds, Seconds } from "./types";
+import { Days, Hours, JulianDayTT, Milliseconds, Seconds } from "./types";
 
 /** ====================== Time Definitions and Epochs ====================== */
 
@@ -40,14 +40,14 @@ export const HALF_DAY: Days = 0.5 as Days;
  * @constant {JulianDay}
  * @unit Julian Day
  */
-export const JULIAN_EPOCH_J1970: JulianDay = 2440588.0 as JulianDay;
+export const JULIAN_EPOCH_J1970: JulianDayTT = 2440588.0 as JulianDayTT;
 
 /**
  * Julian Day for the J2000 epoch (January 1, 2000, 12:00:00 TT).
  * @constant {JulianDay}
  * @unit Julian Day
  */
-export const JULIAN_EPOCH_J2000: JulianDay = 2451545.0 as JulianDay;
+export const JULIAN_EPOCH_J2000: JulianDayTT = 2451545.0 as JulianDayTT;
 
 /**
  * Time unit conversions.

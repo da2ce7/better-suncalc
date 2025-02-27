@@ -16,9 +16,9 @@
  *   to pinpoint exact transit times when H = 0 (meridian crossing).
  *
  * @module transits
- * @see {@link https://www.willbell.com/math/mc1.htm Meeus, Astronomical Algorithms} - Core logic for GMST and transit approximation.
- * @see {@link jd_tt} Time scale conversions.
- * @see {@link utils.refineEvent} Root-finding implementation.
+ * @see {@link https://www.willbell.com/math/mc1.htm Meeus, Astronomical Algorithms}
+ * @see {@link jd_tt} Time scale conversions
+ * @see {@link utils.refineEvent} Root-finding implementation
  */
 
 import { SIDEREAL } from "./constraints/earth";
@@ -33,172 +33,164 @@ import {
   HALF_DAY,
   JULIAN_EPOCH_J2000,
 } from "./constraints/time";
+import {
+  Degrees,
+  JulianCenturyUT1,
+  JulianDayTT,
+  JulianDayUT1,
+  Radians,
+} from "./constraints/types";
 import { ttToUT1 } from "./terrestrialtime";
 import { CelestialCoordinates, refineEvent } from "./utils";
 
+// Update PreciseTransitData to use branded types
 export type PreciseTransitData = {
-  julianCycle: number;
-  transitJD: number;
+  julianCycle: JulianDayTT;
+  transitJD: JulianDayTT;
 };
 
 /**
  * Estimates the integer Julian Day number corresponding to the observer’s local solar day,
  * adjusted for their western longitude and aligned approximately with local noon.
  *
- * This function takes a Julian Day in Terrestrial Time (TT) and shifts it based on the
- * observer’s longitude west of the Prime Meridian, then rounds to the nearest integer.
- * By subtracting `HALF_DAY`, the result approximates the Julian Day starting at local midnight,
- * aligning solar noon (~12h local time) with the middle of the Julian day.
- *
- * @param {number} westLongitudeRadians - Observer’s longitude west in radians (positive west of Prime Meridian). Must be in [-π, π].
- * @param {number} julianDayTT - Julian Day in Terrestrial Time (TT), days since JD 0.
- * @returns {number} An integer Julian Day number representing the observer’s local day.
+ * @param {Radians} westLongitudeRadians - Observer’s longitude west in radians (positive west of Prime Meridian). Must be in [-π, π].
+ * @param {JulianDayTT} julianDayTT - Julian Day in Terrestrial Time (TT), days since JD 0.
+ * @returns {JulianDayTT} An integer Julian Day number representing the observer’s local day.
  * @throws {RangeError} If longitude is outside [-π, π].
  */
 export function approximateLocalJulianDay(
-  westLongitudeRadians: number,
-  julianDayTT: number,
-): number {
+  westLongitudeRadians: Radians,
+  julianDayTT: JulianDayTT,
+): JulianDayTT {
   if (westLongitudeRadians < -PI || westLongitudeRadians > PI) {
     throw new RangeError("Longitude must be in [-π, π] radians.");
   }
-  return Math.round(julianDayTT + westLongitudeRadians / TAU - HALF_DAY);
+  const adjustedJD = julianDayTT + westLongitudeRadians / TAU - HALF_DAY;
+  return Math.round(adjustedJD) as JulianDayTT;
 }
 
 /**
  * Computes Greenwich Sidereal Time (GST) in radians for a given Julian Day (TT).
  * Converts TT to UT1 internally to align with Earth’s rotational time scale.
  *
- * Implements Meeus' approximation for GST (Equation 3.3 in "Astronomical Algorithms"),
- * adjusted internally to use Universal Time (UT1) for rotational accuracy.
- *
- * @param {number} jdTT - Julian Day in Terrestrial Time (TT), days since JD 0.
- * @returns {number} GST in radians, normalized to [0, 2π).
- * @see {@link ttToUT1} for TT to UT1 conversion.
+ * @param {JulianDayTT} jdTT - Julian Day in Terrestrial Time (TT), days since JD 0.
+ * @returns {Radians} GST in radians, normalized to [0, 2π).
  */
-function getGSTRadians(jdTT: number): number {
-  const jdUT1 = ttToUT1(jdTT); // Assume this converts TT to UT1
-  const T = (jdUT1 - JULIAN_EPOCH_J2000) / DAYS_PER_JULIAN_CENTURY;
-
-  let gmstDegrees =
+function getGSTRadians(jdTT: JulianDayTT): Radians {
+  const jdUT1: JulianDayUT1 = ttToUT1(jdTT);
+  const T: JulianCenturyUT1 = ((jdUT1 - JULIAN_EPOCH_J2000) /
+    DAYS_PER_JULIAN_CENTURY) as JulianCenturyUT1;
+  const gmstDegreesNumber =
     SIDEREAL.GMST.BASE +
     SIDEREAL.GMST.DRIFT_RATE * (jdUT1 - JULIAN_EPOCH_J2000) +
     SIDEREAL.GMST.T_SQUARED_COEFF * Math.pow(T, 2) -
     Math.pow(T, 3) / SIDEREAL.GMST.T_CUBED_DIVISOR;
-
-  // Normalize to [0, 360) degrees
-  gmstDegrees =
-    ((gmstDegrees % FULL_CIRCLE_DEGREES) + FULL_CIRCLE_DEGREES) %
-    FULL_CIRCLE_DEGREES;
-
-  return gmstDegrees * DEGREES_TO_RADIANS;
+  const gmstDegrees: Degrees = (((gmstDegreesNumber % FULL_CIRCLE_DEGREES) +
+    FULL_CIRCLE_DEGREES) %
+    FULL_CIRCLE_DEGREES) as Degrees;
+  return (gmstDegrees * DEGREES_TO_RADIANS) as Radians;
 }
 
 /**
  * Computes the hour angle of a celestial object at a reference time (TT),
  * converted to UT1 for Local Sidereal Time (LST) accuracy.
  *
- * Hour angle (H) is calculated as `H = LST - RA`, where LST is derived from GST
- * adjusted for the observer’s longitude. Angles wrap to [0, 2π).
- *
- * @param {number} referenceJulianDayTT - Reference Julian Day in TT. Converted to UT1 internally.
- * @param {number} westLongitudeRadians - Observer’s longitude west in radians (positive west of Prime Meridian).
- * @param {number} raRadians - Right ascension of the celestial object in radians.
- * @returns {number} Hour angle in radians (0 ≤ H < 2π).
+ * @param {JulianDayTT} referenceJulianDayTT - Reference Julian Day in TT. Converted to UT1 internally.
+ * @param {Radians} westLongitudeRadians - Observer’s longitude west in radians (positive west of Prime Meridian).
+ * @param {Radians} raRadians - Right ascension of the celestial object in radians.
+ * @returns {Radians} Hour angle in radians (0 ≤ H < 2π).
  */
 export function computeHourAngleAtRef(
-  referenceJulianDayTT: number,
-  westLongitudeRadians: number,
-  raRadians: number,
-): number {
-  const gst = getGSTRadians(referenceJulianDayTT);
-  const lst = gst - westLongitudeRadians; // Local Sidereal Time
-  let hourAngle = (lst - raRadians) % TAU;
-  return hourAngle < 0 ? hourAngle + TAU : hourAngle;
+  referenceJulianDayTT: JulianDayTT,
+  westLongitudeRadians: Radians,
+  raRadians: Radians,
+): Radians {
+  const gst: Radians = getGSTRadians(referenceJulianDayTT);
+  const lst: Radians = ((((gst - westLongitudeRadians) % TAU) + TAU) %
+    TAU) as Radians;
+  let hourAngle: Radians = ((lst - raRadians) % TAU) as Radians;
+  return hourAngle < 0 ? ((hourAngle + TAU) as Radians) : hourAngle;
 }
 
 /**
  * Estimates the Julian Day of a celestial object's transit (meridian crossing)
  * using a linear approximation of Earth’s rotation.
  *
- * Transit occurs when the hour angle (H) is 0. This assumes Earth rotates at
- * a constant rate of 2π radians per sidereal day. For higher precision, iterate
- * with updated RA/dec values.
- *
- * @param {number} westLongitudeRadians - Observer’s longitude west in radians.
- * @param {number} julianDayTT - Initial guess Julian Day in TT. Converted to UT1 internally.
- * @param {number} raRadians - Right ascension of the object in radians.
- * @returns {number} Estimated transit time in Julian Day (TT).
+ * @param {Radians} westLongitudeRadians - Observer’s longitude west in radians.
+ * @param {JulianDayTT} julianDayTT - Initial guess Julian Day in TT. Converted to UT1 internally.
+ * @param {Radians} raRadians - Right ascension of the object in radians.
+ * @returns {JulianDayTT} Estimated transit time in Julian Day (TT).
  */
 export function estimateTransitTime(
-  westLongitudeRadians: number,
-  julianDayTT: number,
-  raRadians: number,
-): number {
-  const referenceJulianDay = approximateLocalJulianDay(
+  westLongitudeRadians: Radians,
+  julianDayTT: JulianDayTT,
+  raRadians: Radians,
+): JulianDayTT {
+  const referenceJulianDay: JulianDayTT = approximateLocalJulianDay(
     westLongitudeRadians,
     julianDayTT,
   );
-  const hourAngleAtRef = computeHourAngleAtRef(
+  const hourAngleAtRef: Radians = computeHourAngleAtRef(
     referenceJulianDay,
     westLongitudeRadians,
     raRadians,
   );
-  // Earth rotates at ~2π radians per solar day (~366.24 sidereal rotations/year)
-  return referenceJulianDay - hourAngleAtRef / TAU;
+  return (referenceJulianDay - hourAngleAtRef / TAU) as JulianDayTT;
 }
 
 /**
  * Generalized refined transit finder.
- * @param {number} referenceJulianCycle - Reference cycle number for iteration.
- * @param {number} lw - Observer's west longitude (radians).
- * @param {(jd_tt: number) => CelestialCoordinates} getObjectCoords - Function to compute celestial object's coordinates.
- * @returns {number} Precise JD TT of transit for the given cycle.
+ * @param {JulianDayTT} referenceJulianCycle - Reference cycle number for iteration.
+ * @param {Radians} lw - Observer's west longitude (radians).
+ * @param {(jd_tt: JulianDayTT) => CelestialCoordinates} getObjectCoords - Function to compute celestial object's coordinates.
+ * @returns {JulianDayTT} Precise JD TT of transit for the given cycle.
  */
 export function getPreciseTransitForCycle(
-  referenceJulianCycle: number,
-  lw: number,
-  getObjectCoords: (jd_tt: number) => CelestialCoordinates,
-): number {
-  // Generalized transit estimation from existing code
-  const jd_initial = estimateTransitTime(
-    lw,
-    referenceJulianCycle,
-    getObjectCoords(referenceJulianCycle).ra,
+  referenceCycleJdTT: JulianDayTT,
+  westLongitudeRad: Radians,
+  getObjectCoords: (jd_tt: JulianDayTT) => CelestialCoordinates,
+): JulianDayTT {
+  const initialTransitEstimateJdTT: JulianDayTT = estimateTransitTime(
+    westLongitudeRad,
+    referenceCycleJdTT,
+    getObjectCoords(referenceCycleJdTT).ra,
   );
 
-  const evaluator = (jd_tt: number): number => {
+  const evaluator = (jd_tt: JulianDayTT): number => {
     const coords = getObjectCoords(jd_tt);
-    const gmst = getGSTRadians(jd_tt);
-    const lst = (gmst - lw + TAU) % TAU;
+    const gmst: Radians = getGSTRadians(jd_tt);
+    const lst: Radians = ((gmst - westLongitudeRad + TAU) % TAU) as Radians;
     let diff = lst - coords.ra;
-    // Normalize to [-π, π)
     if (diff > PI) diff -= TAU;
     if (diff < -PI) diff += TAU;
     return diff;
   };
 
-  return refineEvent(jd_initial, evaluator, 0); // Assuming refineEvent is implemented
+  return refineEvent(
+    initialTransitEstimateJdTT as number,
+    evaluator as (t: number) => number,
+    0,
+  ) as JulianDayTT;
 }
 
 /**
  * Finds the closest transit cycle for any celestial object.
- * @param {number} jd_tt - Reference JD TT for the search.
- * @param {number} lw - Observer's longitude west (radians).
- * @param {(jd_tt: number) => CelestialCoordinates} getObjectCoords - Coordinates function.
+ * @param {JulianDayTT} jd_tt - Reference JD TT for the search.
+ * @param {Radians} lw - Observer's longitude west (radians).
+ * @param {(jd_tt: JulianDayTT) => CelestialCoordinates} getObjectCoords - Coordinates function.
  * @param {number} [maxCycleErrorDays=HALF_DAY] - Window to compare adjacent cycles (default for daily transits).
  * @returns {PreciseTransitData} Closest transit cycle and JD TT.
  */
 export function getClosestTransitCycle(
-  jd_tt: number,
-  lw: number,
-  getObjectCoords: (jd_tt: number) => CelestialCoordinates,
-  maxCycleErrorDays: number = HALF_DAY,
+  jd_tt: JulianDayTT,
+  lw: Radians,
+  getObjectCoords: (jd_tt: JulianDayTT) => CelestialCoordinates,
+  maxCycleErrorDays = HALF_DAY,
 ): PreciseTransitData {
-  // Generalized cycle estimation using existing transit tools
-  const initialCycle = Math.round(approximateLocalJulianDay(lw, jd_tt));
-
-  const t_n_precise = getPreciseTransitForCycle(
+  const initialCycle: JulianDayTT = Math.round(
+    approximateLocalJulianDay(lw, jd_tt),
+  ) as JulianDayTT;
+  const t_n_precise: JulianDayTT = getPreciseTransitForCycle(
     initialCycle,
     lw,
     getObjectCoords,
@@ -209,9 +201,10 @@ export function getClosestTransitCycle(
     return { julianCycle: initialCycle, transitJD: t_n_precise };
   }
 
-  const adjacentCycle =
-    t_n_precise < jd_tt ? initialCycle + 1 : initialCycle - 1;
-  const t_adjacent = getPreciseTransitForCycle(
+  const adjacentCycle: JulianDayTT = (
+    t_n_precise < jd_tt ? initialCycle + 1 : initialCycle - 1
+  ) as JulianDayTT;
+  const t_adjacent: JulianDayTT = getPreciseTransitForCycle(
     adjacentCycle,
     lw,
     getObjectCoords,

@@ -14,7 +14,8 @@
 import { EARTH } from "./constraints/earth";
 import { PI, TAU } from "./constraints/math";
 import { JULIAN_EPOCH_J2000 } from "./constraints/time";
-import { eclipticLongitude, solarMeanAnomaly } from "./suncoords";
+import { Days, JulianDayTT, Radians } from "./constraints/types";
+import { eclipticLongitude } from "./suncoords";
 import { addUniqueJD, generateEventSeeds, refineEvent } from "./utils";
 
 /**
@@ -27,10 +28,10 @@ import { addUniqueJD, generateEventSeeds, refineEvent } from "./utils";
  * @throws Error if targetPhase is not in [0,1)
  */
 export function getSunPhases(
-  startJD: number,
-  endJD: number,
+  startJD: JulianDayTT,
+  endJD: JulianDayTT,
   targetPhase: number,
-): number[] {
+): JulianDayTT[] {
   // Normalize the range to ensure startJD <= endJD
   if (startJD > endJD) {
     [startJD, endJD] = [endJD, startJD];
@@ -42,43 +43,45 @@ export function getSunPhases(
   }
 
   // Calculate the reference JD for the target phase relative to the reference March equinox
-  const referenceJD =
-    EARTH.SEASONAL_EVENTS.VERNAL_EQUINOX_2000 +
-    targetPhase * EARTH.ORBIT.TROPICAL_YEAR;
+  const referenceJD = (EARTH.SEASONAL_EVENTS.VERNAL_EQUINOX_2000 +
+    targetPhase * EARTH.ORBIT.TROPICAL_YEAR) as JulianDayTT;
 
   // Generate approximate seed times for the phase events within the range
   const seeds = generateEventSeeds(
     startJD,
     endJD,
-    EARTH.SEASONAL_EVENTS.VERNAL_EQUINOX_2000,
-    EARTH.ORBIT.TROPICAL_YEAR,
-    5, // 5-day convergence window to ensure all events are captured
-  );
+    EARTH.SEASONAL_EVENTS.VERNAL_EQUINOX_2000 as JulianDayTT,
+    EARTH.ORBIT.TROPICAL_YEAR as Days,
+    5 as Days,
+  ) as JulianDayTT[];
 
-  const results: number[] = [];
+  const results: JulianDayTT[] = [];
 
   // Define the target ecliptic longitude in radians (phase fraction of a full circle)
-  const targetLongitude = TAU * targetPhase;
+  const targetLongitude = (TAU * targetPhase) as Radians;
 
   // Refine each seed to find the exact JD when the sun's ecliptic longitude matches the target
   for (const jdSeed of seeds) {
     // Convert JD to days since J2000 for calculations
-    const tSeed = jdSeed - JULIAN_EPOCH_J2000;
+    const tSeed = (jdSeed - JULIAN_EPOCH_J2000) as Days;
 
     // Evaluator function: computes the difference between current and target ecliptic longitude
-    const evaluator = (t: number): number => {
-      const M = solarMeanAnomaly(t); // Solar mean anomaly at time t
-      const L = eclipticLongitude(M); // Ecliptic longitude in radians
+    const evaluator = (t: JulianDayTT): number => {
+      const L = eclipticLongitude(t); // Corrected: use t instead of M
       // Normalize longitude to [0, 2π)
-      const adjustedL = ((L % TAU) + TAU) % TAU;
+      const adjustedL = (((L % TAU) + TAU) % TAU) as Radians;
       // Compute the smallest angular difference, accounting for periodicity
       const diff = adjustedL - targetLongitude;
       return ((diff + PI) % TAU) - PI;
     };
 
     // Refine the seed to find the exact time where the evaluator is zero
-    const tRefined = refineEvent(tSeed, evaluator, 0);
-    const jdRefined = tRefined + JULIAN_EPOCH_J2000;
+    const tRefined = refineEvent(
+      tSeed,
+      evaluator as (t: number) => number,
+      0,
+    ) as Days;
+    const jdRefined = (tRefined + JULIAN_EPOCH_J2000) as JulianDayTT;
 
     // Add the refined JD to results if it falls within the specified range
     if (jdRefined >= startJD && jdRefined <= endJD) {

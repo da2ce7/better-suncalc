@@ -10,16 +10,10 @@
 export type Degrees = number & { readonly __brand: "Degrees" };
 
 /**
- * Represents a time interval in days.
- * @typedef {number & { readonly __brand: "Days" }} Days
+ * Represents an angle in radians.
+ * @typedef {number & { readonly __brand: "Radians" }} Radians
  */
-export type Days = number & { readonly __brand: "Days" };
-
-/**
- * Represents a time interval in seconds.
- * @typedef {number & { __brand: "Seconds" }} Seconds
- */
-export type Seconds = number & { readonly __brand: "Seconds" };
+export type Radians = number & { readonly __brand: "Radians" };
 
 /**
  * Represents a time interval in milliseconds.
@@ -28,23 +22,118 @@ export type Seconds = number & { readonly __brand: "Seconds" };
 export type Milliseconds = number & { readonly __brand: "Milliseconds" };
 
 /**
+ * Represents a time interval in seconds.
+ * @typedef {number & { __brand: "Seconds" }} Seconds
+ */
+export type Seconds = number & { readonly __brand: "Seconds" };
+
+/**
  * Represents a time interval in hours.
  * @typedef {number & { __brand: "Hours" }} Hours
  */
 export type Hours = number & { readonly __brand: "Hours" };
 
 /**
- * Represents a Julian Day number, a continuous count of days since the Julian epoch.
- * @typedef {number & { readonly __brand: "JulianDay" }} JulianDay
+ * Represents a time interval in days.
+ * @typedef {number & { readonly __brand: "Days" }} Days
  */
-export type JulianDay = number & { readonly __brand: "JulianDay" };
+export type Days = number & { readonly __brand: "Days" };
 
 /**
- * Represents a rate of change in degrees per century squared.
+ * Represents a count of Julian Days in Terrestrial Time (TT) since J0.
+ * @typedef {number & { readonly __brand: "JulianDayTT" }} JulianDayTT
  */
-export type DegreesPerCenturySquared = number & {
-  readonly __brand: "DegreesPerCenturySquared";
+export type JulianDayTT = number & { readonly __brand: "JulianDayTT" };
+
+/**
+ * Represents a count of Julian Days in Universal Time (UT1) since J0.
+ * @typedef {number & { readonly __brand: "JulianDayUT1" }} JulianDayUT1
+ */
+export type JulianDayUT1 = number & { readonly __brand: "JulianDayUT1" };
+
+/**
+ * Represents a count of Julian Years in Terrestrial Time (TT) since J0.
+ * @typedef {number & { readonly __brand: "JulianYearTT" }} JulianYearTT
+ */
+export type JulianYearTT = number & { readonly __brand: "JulianYearTT" };
+
+/**
+ * Represents a count of Julian Years in Universal Time (UT1) since J0.
+ * @typedef {number & { readonly __brand: "JulianYearUT1" }} JulianYearUT1
+ */
+export type JulianYearUT1 = number & { readonly __brand: "JulianYearUT1" };
+
+/**
+ * Represents a count of Julian Centuries in Terrestrial Time (TT) since J0.
+ * @typedef {number & { readonly __brand: "JulianCenturyTT" }} JulianCenturyTT
+ */
+export type JulianCenturyTT = number & { readonly __brand: "JulianCenturyTT" };
+
+/**
+ * Represents a count of Julian Centuries in Universal Time (UT1) since J0.
+ * @typedef {number & { readonly __brand: "JulianCenturyUT1" }} JulianCenturyUT1
+ */
+export type JulianCenturyUT1 = number & {
+  readonly __brand: "JulianCenturyUT1";
 };
+
+/**
+ * Represents a count of Julian Days in Terrestrial Time (TT) since J2000.
+ * @typedef {number & { readonly __brand: "J2000DayTT" }} J2000DayTT
+ */
+export type J2000DayTT = number & { readonly __brand: "J2000DayTT" };
+
+/**
+ * Represents a count of Julian Days in Universal Time (UT1) since J2000.
+ * @typedef {number & { readonly __brand: "J2000DayUT1" }} J2000DayUT1
+ */
+export type J2000DayUT1 = number & { readonly __brand: "J2000DayUT1" };
+
+/**
+ * Represents a count of Julian Years in Terrestrial Time (TT) since J2000.
+ * @typedef {number & { readonly __brand: "J2000YearTT" }} J2000YearTT
+ */
+export type J2000YearTT = number & { readonly __brand: "J2000YearTT" };
+
+/**
+ * Represents a count of Julian Years in Universal Time (UT1) since J2000.
+ * @typedef {number & { readonly __brand: "J2000YearUT1" }} J2000YearUT1
+ */
+export type J2000YearUT1 = number & { readonly __brand: "J2000YearUT1" };
+
+/**
+ * Represents a count of Julian Centuries in Terrestrial Time (TT) since J2000.
+ * @typedef {number & { readonly __brand: "J2000CenturyTT" }} J2000CenturyTT
+ */
+export type J2000CenturyTT = number & { readonly __brand: "J2000CenturyTT" };
+
+/**
+ * Represents a count of Julian Centuries in Universal Time (UT1) since J2000.
+ * @typedef {number & { readonly __brand: "J2000CenturyUT1" }} J2000CenturyUT1
+ */
+export type J2000CenturyUT1 = number & {
+  readonly __brand: "J2000CenturyUT1";
+};
+
+/**
+ * Represents a rate of change in degrees per Julian Centuries in Terrestrial Time (TT) since J2000.
+ */
+export type DegreesPerJ2000CenturyTT_Squared = number & {
+  readonly __brand: "DegreesPerJ2000CenturyTT_Squared";
+};
+
+/**
+ * Represents a rate of change in degrees per Julian Centuries in Universal Time (UT1) since J0.
+ */
+export type DegreesPerJulianCenturyUT1_Squared = number & {
+  readonly __brand: "DegreesPerJulianCenturyUT1_Squared";
+};
+
+/**
+ * Represents a distance in Kilometers.
+ * @typedef {number & { readonly __brand: "Kilometers" }} Kilometers
+ */
+export type Kilometers = number & { readonly __brand: "Kilometers" };
 
 /**
  * Represents a distance in astronomical units (AU).
@@ -59,24 +148,12 @@ export type AU = number & { readonly __brand: "AU" };
 export type DegreesPerDay = number & { readonly __brand: "DegreesPerDay" };
 
 /**
- * Represents a rate of change in degrees per century.
- * @typedef {number & { readonly __brand: "DegreesPerCentury" }} DegreesPerCentury
+ * Represents a rate of change in degrees per Julian Centuries in Terrestrial Time (TT) since J2000.
+ * @typedef {number & { readonly __brand: "DegreesPerJ2000CenturyTT" }} DegreesPerJ2000CenturyTT
  */
-export type DegreesPerCentury = number & {
-  readonly __brand: "DegreesPerCentury";
+export type DegreesPerJ2000CenturyTT = number & {
+  readonly __brand: "DegreesPerJ2000CenturyTT";
 };
-
-/**
- * Represents a year in the Julian calendar (365.25 days).
- * @typedef {number & { readonly __brand: "JulianYear" }} JulianYear
- */
-export type JulianYear = number & { readonly __brand: "JulianYear" };
-
-/**
- * Represents Terrestrial Time (TT), a uniform time standard.
- * @typedef {number & { readonly __brand: "TT" }} TerrestrialTime
- */
-export type TerrestrialTime = number & { readonly __brand: "TT" };
 
 /**
  * Represents orbital parameters for celestial bodies.
