@@ -10,26 +10,13 @@
  * - Numerical methods include stability thresholds to handle floating-point edge cases.
  */
 
-import {
-  DELTA_T_POLYNOMIAL_SEGMENTS,
-  EARTH,
-  REFRACTION,
-} from "./constraints/earth";
-import {
-  DEGREES_TO_RADIANS,
-  EVENT_THRESHOLDS,
-  NUMERICAL,
-  PI,
-  TAU,
-} from "./constraints/math";
+import { EARTH, REFRACTION } from "./constraints/earth";
+import { DEGREES_TO_RADIANS, NUMERICAL, PI, TAU } from "./constraints/math";
 import {
   DAYS_PER_JULIAN_CENTURY,
-  HALF_DAY,
-  JULIAN_CONVERSION,
-  JULIAN_EPOCH_J1970,
   JULIAN_EPOCH_J2000,
-  TIME_UNITS,
 } from "./constraints/time";
+import { computeHourAngleAtRef } from "./transits";
 
 /** ================== Type and Interface Definitions ================== */
 
@@ -92,70 +79,6 @@ export const DEFAULT_REFINEMENT: RefinementConfig = {
 /** ================== Time Conversion Utilities ================== */
 
 /**
- * Approximates ΔT (TT - UTC in seconds) using polynomial models.
- * @param {Date} date - UTC date to evaluate.
- * @returns {number} ΔT in seconds.
- */
-export function deltaT(date: Date): number {
-  const y = date.getUTCFullYear() + date.getUTCMonth() / 12;
-  for (const c of DELTA_T_POLYNOMIAL_SEGMENTS) {
-    if (y < c.maxYear) {
-      const t = (y - c.base) / c.scale;
-      let result = 0;
-      for (let i = 0; i < c.coeffs.length; i++) {
-        result += c.coeffs[i] * Math.pow(t, i);
-      }
-      return result;
-    }
-  }
-  throw new Error("Year out of range for ΔT calculation");
-}
-
-/**
- * Converts a UTC Date to a Terrestrial Time (TT) Julian Date.
- * @param {Date} date - UTC date/time.
- * @returns {number} Julian Date in TT.
- */
-export function dateToJulian(date: Date): number {
-  const utcMS = date.getTime();
-  const utcJD =
-    utcMS / TIME_UNITS.MILLISECONDS.DAY - HALF_DAY + JULIAN_EPOCH_J1970;
-  return utcJD + deltaT(date) / TIME_UNITS.SECONDS.DAY;
-}
-
-/**
- * Converts a TT Julian Date to a UTC Date via iterative approximation.
- * @param {number} ttJD - Julian Date in Terrestrial Time.
- * @returns {Date} UTC Date within ±1ms of actual time.
- */
-export function julianToDate(ttJD: number): Date {
-  let utcJD = ttJD;
-  let date: Date;
-  for (let i = 0; i < JULIAN_CONVERSION.MAX_ITERATIONS; i++) {
-    date = new Date(
-      (utcJD + HALF_DAY - JULIAN_EPOCH_J1970) * TIME_UNITS.MILLISECONDS.DAY,
-    );
-    const delta = deltaT(date) / TIME_UNITS.SECONDS.DAY;
-    utcJD = ttJD - delta;
-  }
-  return new Date(
-    Math.round(
-      (utcJD - JULIAN_EPOCH_J1970 + HALF_DAY) * TIME_UNITS.MILLISECONDS.DAY,
-    ),
-  );
-}
-
-/**
- * Generates a new Date offset by hours from an original (UTC-aware).
- * @param {Date} date - Base UTC date.
- * @param {number} hours - Offset (±) in hours.
- * @returns {Date} New UTC Date.
- */
-export function hoursLater(date: Date, hours: number): Date {
-  return new Date(date.getTime() + hours * TIME_UNITS.MILLISECONDS.HOUR);
-}
-
-/**
  * Calculates the number of Julian centuries since the J2000 epoch.
  * @param {number} jd - Julian day.
  * @returns {number} Number of Julian centuries since J2000.
@@ -185,18 +108,6 @@ export function latitudeToRad(lat: number): number {
 }
 
 /** ================== Celestial Position Calculations ================== */
-
-/**
- * Calculates approximate Greenwich Mean Sidereal Time (GMST).
- * @param {number} jd - Julian Date in TT.
- * @param {number} lw - Longitude west in radians.
- * @returns {number} GMST in radians.
- */
-export function siderealTime(jd: number, lw: number): number {
-  const d = jd - JULIAN_EPOCH_J2000;
-  const gmst = DEGREES_TO_RADIANS * (280.16 + 360.9856235 * d);
-  return (((gmst - lw) % TAU) + TAU) % TAU;
-}
 
 /**
  * Calculates geometric altitude angle (no refraction).
@@ -242,7 +153,7 @@ export function calculateCelestialPosition(
   const lw = longitudeToRadWest(lng);
   const phi = latitudeToRad(lat);
   const c = coordFn(jd);
-  const H = siderealTime(jd, lw) - c.ra;
+  const H = computeHourAngleAtRef(jd, lw, c.ra);
   const geomAlt = altitude(H, phi, c.dec);
   return {
     azimuth: azimuth(H, phi, c.dec),
@@ -309,70 +220,6 @@ export function astroRefraction(h: number): number {
   return tanTerm !== 0
     ? (REFRACTION.SAEMUNDSSON.COEFFICIENT / tanTerm) * DEGREES_TO_RADIANS
     : 0;
-}
-
-/** ================== Astronomical Event Detection ================== */
-
-/**
- * Linear interpolation for crossing estimation.
- * @internal
- */
-function linearInterpolateCrossing(
-  x1: number,
-  x2: number,
-  y1: number,
-  y2: number,
-): number {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  return dy === 0 ? x1 : x1 - y1 * (dx / dy);
-}
-
-/**
- * Detects altitude threshold crossings.
- * @param {EventWindow} config - Search parameters.
- * @returns {{ rise?: number; set?: number; alwaysUp?: boolean; alwaysDown?: boolean }}
- */
-export function findAltitudeCrossingEvents({
-  start,
-  end,
-  evaluator,
-  threshold,
-  windowSize = EVENT_THRESHOLDS.WINDOW.DEFAULT,
-}: EventWindow): {
-  rise?: number;
-  set?: number;
-  alwaysUp?: boolean;
-  alwaysDown?: boolean;
-} {
-  let current = start;
-  let prevAlt = evaluator(current) - threshold;
-  const result: ReturnType<typeof findAltitudeCrossingEvents> = {};
-
-  while (current < end) {
-    const next = current + windowSize;
-    const nextAlt = evaluator(next) - threshold;
-
-    if (Math.sign(prevAlt) !== Math.sign(nextAlt)) {
-      const crossing = linearInterpolateCrossing(
-        current,
-        next,
-        prevAlt,
-        nextAlt,
-      );
-      prevAlt < 0 ? (result.rise = crossing) : (result.set = crossing);
-    }
-
-    prevAlt = nextAlt;
-    current = next;
-  }
-
-  if (!result.rise && !result.set) {
-    const meanAlt = evaluator((start + end) / 2);
-    meanAlt > threshold ? (result.alwaysUp = true) : (result.alwaysDown = true);
-  }
-
-  return result;
 }
 
 /** ================== Numerical Root-Finding Methods ================== */

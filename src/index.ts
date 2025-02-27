@@ -17,18 +17,14 @@ export {
   computeDerivative,
   dateToJulian,
   DEFAULT_REFINEMENT,
-  deltaT,
   EventWindow,
-  findAltitudeCrossingEvents,
   generateEventSeeds,
-  hoursLater,
   julianToDate,
   latitudeToRad,
   longitudeToRadWest,
   PositionData,
   refineEvent,
   RefinementConfig,
-  siderealTime,
 } from "./utils";
 
 /** Re-exports from suncalc.ts */

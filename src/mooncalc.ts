@@ -10,13 +10,13 @@ import { AU_TO_KM, DEGREES_TO_RADIANS, PI } from "./constraints/math";
 import { JULIAN_EPOCH_J2000 } from "./constraints/time";
 import { calculateLunarCoordinates } from "./mooncoords";
 import { sunCoords } from "./suncalc";
+import { computeHourAngleAtRef } from "./transits";
 import {
   altitude,
   astroRefraction,
   azimuth,
   latitudeToRad,
   longitudeToRadWest,
-  siderealTime,
 } from "./utils";
 
 /* ==================== Moon Types ==================== */
@@ -106,7 +106,7 @@ export function getMoonPosition(
     LUNAR.PERTURBATIONS.EVECTION_LONGITUDE_AMPLITUDE * meanDist; // Approximate variation
   const dist = meanDist - variationCoeff * Math.cos(M);
 
-  const H = siderealTime(d, lw) - ra;
+  const H = computeHourAngleAtRef(d, lw, ra);
   let h = altitude(H, phi, dec);
   const pa = Math.atan2(
     Math.sin(H),

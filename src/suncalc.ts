@@ -14,7 +14,7 @@ import {
 } from "./constraints/math";
 import { HALF_DAY } from "./constraints/time";
 import { calculateSolarCoordinates } from "./suncoords";
-import { getClosestTransitCycle } from "./transits";
+import { computeHourAngleAtRef, getClosestTransitCycle } from "./transits";
 import {
   altitude,
   astroRefraction,
@@ -24,7 +24,6 @@ import {
   latitudeToRad,
   longitudeToRadWest,
   PositionData,
-  siderealTime,
 } from "./utils";
 
 /* ==================== Types ==================== */
@@ -100,7 +99,7 @@ export function getPosition(
   const lw = longitudeToRadWest(lng); // Convert longitude to radians west
   const phi = latitudeToRad(lat); // Convert latitude to radians
   const c = sunCoords(jd_tt); // Sun coordinates using JD TT
-  const H = siderealTime(jd_tt, lw) - c.ra; // Hour angle using JD TT directly
+  const H = computeHourAngleAtRef(jd_tt, lw, c.ra); // Hour angle using JD TT directly
 
   // Calculate geometric altitude then apply atmospheric refraction
   const geomAlt = altitude(H, phi, c.dec);
