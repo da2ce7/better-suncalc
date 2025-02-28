@@ -22,14 +22,6 @@ export const PI = Math.PI; // Unitless, used in conversions
 export const TAU = 2 * PI; // Unitless
 
 /**
- * Conversion factor from degrees to radians.
- * @constant {number}
- * @unit unitless
- * @example radians = degrees * DEGREES_TO_RADIANS
- */
-export const DEGREES_TO_RADIANS = PI / 180; // Unitless
-
-/**
  * Full circle in degrees.
  * @unit degrees
  */

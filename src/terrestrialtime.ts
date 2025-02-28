@@ -27,18 +27,18 @@ export function dateToJulian(date: Date): JulianDayTT {
 
 /**
  * Converts a TT Julian Date to a UTC Date via iterative approximation.
- * @param {JulianDayTT} ttJD - Julian Date in Terrestrial Time.
+ * @param {JulianDayTT} time - Julian Date in Terrestrial Time.
  * @returns {Date} UTC Date within ±1ms of actual time.
  */
-export function julianToDate(ttJD: JulianDayTT): Date {
-  let utcJD = ttJD;
+export function julianToDate(time: JulianDayTT): Date {
+  let utcJD = time;
   let date: Date;
   for (let i = 0; i < JULIAN_CONVERSION.MAX_ITERATIONS; i++) {
     date = new Date(
       (utcJD + HALF_DAY - JULIAN_EPOCH_J1970) * TIME_UNITS.MILLISECONDS.DAY,
     );
     const delta = deltaT(date) / TIME_UNITS.SECONDS.DAY;
-    utcJD = (ttJD - delta) as JulianDayTT;
+    utcJD = (time - delta) as JulianDayTT;
   }
   const finalUtcJD =
     (utcJD - JULIAN_EPOCH_J1970 + HALF_DAY) * TIME_UNITS.MILLISECONDS.DAY;
@@ -80,8 +80,8 @@ export function deltaT(date: Date): Seconds {
  * (typically within ±0.9 seconds). For precise UT1 calculations,
  * use IERS EOP data instead of this approximate method
  */
-export function ttToUT1(jdTT: JulianDayTT): JulianDayUT1 {
-  const date = new Date(((jdTT - 2440587.5) * 86400000) as Milliseconds);
+export function ttToUT1(time: JulianDayTT): JulianDayUT1 {
+  const date = new Date(((time - 2440587.5) * 86400000) as Milliseconds);
   const ΔT = deltaT(date);
-  return (jdTT - ΔT / 86400) as JulianDayUT1;
+  return (time - ΔT / 86400) as JulianDayUT1;
 }

@@ -11,7 +11,7 @@
  */
 
 import { EARTH, REFRACTION } from "./constraints/earth";
-import { DEGREES_TO_RADIANS, NUMERICAL, PI, TAU } from "./constraints/math";
+import { NUMERICAL, TAU } from "./constraints/math";
 import {
   DAYS_PER_JULIAN_CENTURY,
   JULIAN_EPOCH_J2000,
@@ -21,6 +21,7 @@ import {
   Days,
   Degrees,
   J2000CenturyTT,
+  J2000DayTT,
   JulianDayTT,
   Radians,
 } from "./constraints/types";
@@ -43,11 +44,11 @@ export type PositionData = {
  * Represents the celestial coordinates of an object (e.g., moon or sun).
  */
 export type CelestialCoordinates = {
-  ra: Radians;
-  dec: Radians;
+  rightAscension: Radians;
+  declination: Radians;
   distance: AU;
-  eclipticLon?: Radians;
-  eclipticLat?: Radians;
+  eclipticLongitude?: Radians;
+  eclipticLatitude?: Radians;
 };
 
 /**
@@ -57,7 +58,7 @@ export type CelestialCoordinates = {
 export interface EventWindow {
   start: JulianDayTT;
   end: JulianDayTT;
-  evaluator: (jd: JulianDayTT) => number;
+  evaluator: (time: JulianDayTT) => number;
   threshold: number;
   windowSize?: Days;
 }
@@ -86,46 +87,89 @@ export const DEFAULT_REFINEMENT: RefinementConfig = {
   floatingPointEpsilon: NUMERICAL.EPSILON.FLOATING_POINT_DAYS as number, // // ~69μs
 };
 
+/** ================== Math Conversion Utilities ================== */
+
+/**
+ * Converts a value from degrees to radians.
+ * @param degrees - The value in degrees.
+ * @returns The equivalent value in radians.
+ */
+export function degreesToRadians(degrees: Degrees): Radians {
+  return (degrees * (Math.PI / 180)) as Radians;
+}
+
+/**
+ * Converts a value from radians to degrees.
+ * @param radians - The value in radians.
+ * @returns The equivalent value in degrees.
+ */
+export function radiansToDegrees(radians: Radians): Degrees {
+  return (radians * (180 / Math.PI)) as Degrees;
+}
+
 /** ================== Time Conversion Utilities ================== */
 
 // Utility functions for operations with branded types
 /**
  * Adds a number of days to a Julian Day TT value.
- * @param jd - The base Julian Day TT
- * @param days - The number of days to add
+ * @param time - The base Julian Day TT
+ * @param time_length - The number of days to add
  * @returns The resulting Julian Day TT
  */
-export function addDaysToJD(jd: JulianDayTT, days: Days): JulianDayTT {
-  return ((jd as number) + days) as number as JulianDayTT;
+export function addDaysToJD(time: JulianDayTT, time_length: Days): JulianDayTT {
+  return ((time as number) + time_length) as number as JulianDayTT;
 }
 
 /**
  * Subtracts a number of days to a Julian Day TT value.
- * @param jd - The base Julian Day TT
- * @param days - The number of days to subtract
+ * @param time - The base Julian Day TT
+ * @param time_length - The number of days to subtract
  * @returns The resulting Julian Day TT
  */
-export function subtractDaysFromJD(jd: JulianDayTT, days: Days): JulianDayTT {
-  return ((jd as number) - days) as number as JulianDayTT;
+export function subtractDaysFromJD(
+  time: JulianDayTT,
+  time_length: Days,
+): JulianDayTT {
+  return ((time as number) - time_length) as number as JulianDayTT;
 }
 
 /**
  * Subtracts one Julian Day TT from another to get the difference in days.
- * @param jd1 - The first Julian Day TT
- * @param jd2 - The second Julian Day TT to subtract
+ * @param time1 - The first Julian Day TT
+ * @param time2 - The second Julian Day TT to subtract
  * @returns The difference in days
  */
-export function subtractJDs(jd1: JulianDayTT, jd2: JulianDayTT): Days {
-  return ((jd1 as number) - jd2) as number as Days;
+export function subtractJDs(time1: JulianDayTT, time2: JulianDayTT): Days {
+  return ((time1 as number) - time2) as number as Days;
+}
+
+/**
+ * Converts a Julian Day in Terrestrial Time to the number of days since the J2000 epoch.
+ * @param julianDay - The Julian Day in Terrestrial Time (TT).
+ * @returns The number of days since the J2000 epoch (January 1, 2000, 12:00 TT).
+ */
+export function julianDayToJ2000Day(time: JulianDayTT): J2000DayTT {
+  return (time - JULIAN_EPOCH_J2000) as J2000DayTT;
+}
+
+/**
+ * Converts the number of days since the J2000 epoch to a Julian Day in Terrestrial Time.
+ * @param j2000Day - The number of days since the J2000 epoch (January 1, 2000, 12:00 TT).
+ * @returns The corresponding Julian Day in Terrestrial Time (TT).
+ */
+export function j2000DayToJulianDay(time: J2000DayTT): JulianDayTT {
+  return (time + JULIAN_EPOCH_J2000) as JulianDayTT;
 }
 
 /**
  * Calculates the number of Julian centuries since the J2000 epoch.
- * @param {JulianDayTT} jd - Julian day in TT.
+ * @param {JulianDayTT} time - Julian day in TT.
  * @returns {J2000CenturyTT} Number of Julian centuries since J2000.
  */
-export function getJulianCenturiesSinceJ2000(jd: JulianDayTT): J2000CenturyTT {
-  return ((jd - JULIAN_EPOCH_J2000) /
+export function getJulianCenturiesSinceJ2000(
+  time: JulianDayTT,
+): J2000CenturyTT {
+  return ((time - JULIAN_EPOCH_J2000) /
     DAYS_PER_JULIAN_CENTURY) as J2000CenturyTT;
 }
 
@@ -133,80 +177,90 @@ export function getJulianCenturiesSinceJ2000(jd: JulianDayTT): J2000CenturyTT {
 
 /**
  * Converts geographic longitude to radians (west-positive).
- * @param {Degrees} lng - Longitude in degrees (-180 to 180, E-positive).
+ * @param {Degrees} longitude - Longitude in degrees (-180 to 180, E-positive).
  * @returns {Radians} Longitude in radians (-π to π, W-positive).
  */
-export function longitudeToRadWest(lng: Degrees): Radians {
-  return (DEGREES_TO_RADIANS * -lng) as Radians;
+export function longitudeToRadWest(longitude: Degrees): Radians {
+  return degreesToRadians(-longitude as Degrees);
 }
 
 /**
  * Converts geographic latitude to radians.
- * @param {Degrees} lat - Latitude in degrees (-90 to 90).
+ * @param {Degrees} latitude - Latitude in degrees (-90 to 90).
  * @returns {Radians} Latitude in radians (-π/2 to π/2).
  */
-export function latitudeToRad(lat: Degrees): Radians {
-  return (DEGREES_TO_RADIANS * lat) as Radians;
+export function latitudeToRad(latitude: Degrees): Radians {
+  return degreesToRadians(latitude);
 }
 
 /** ================== Celestial Position Calculations ================== */
 
 /**
  * Calculates geometric altitude angle (no refraction).
- * @param {Radians} H - Hour angle in radians.
- * @param {Radians} phi - Latitude in radians.
- * @param {Radians} dec - Declination in radians.
+ * @param {Radians} hourAngle - Hour angle in radians.
+ * @param {Radians} latitude - Latitude in radians.
+ * @param {Radians} declination - Declination in radians.
  * @returns {Radians} Altitude in radians.
  */
-export function altitude(H: Radians, phi: Radians, dec: Radians): Radians {
+export function altitude(
+  hourAngle: Radians,
+  latitude: Radians,
+  declination: Radians,
+): Radians {
   return Math.asin(
-    Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H),
+    Math.sin(latitude) * Math.sin(declination) +
+      Math.cos(latitude) * Math.cos(declination) * Math.cos(hourAngle),
   ) as Radians;
 }
 
 /**
  * Calculates azimuth angle for a celestial object.
- * @param {Radians} H - Hour angle in radians.
- * @param {Radians} phi - Latitude in radians.
- * @param {Radians} dec - Declination in radians.
+ * @param {Radians} hourAngle - Hour angle in radians.
+ * @param {Radians} latitude - Latitude in radians.
+ * @param {Radians} declination - Declination in radians.
  * @returns {Radians} Azimuth in radians (0 at north, clockwise).
  */
-export function azimuth(H: Radians, phi: Radians, dec: Radians): Radians {
+export function azimuth(
+  hourAngle: Radians,
+  latitude: Radians,
+  declination: Radians,
+): Radians {
   return Math.atan2(
-    Math.sin(H),
-    Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi),
+    Math.sin(hourAngle),
+    Math.cos(hourAngle) * Math.sin(latitude) -
+      Math.tan(declination) * Math.cos(latitude),
   ) as Radians;
 }
 
 /**
  * Calculates observed celestial position with refraction.
- * @param {JulianDayTT} jd - Julian day in TT.
- * @param {Degrees} lat - Latitude in degrees.
- * @param {Degrees} lng - Longitude in degrees.
+ * @param {JulianDayTT} time - Julian day in TT.
+ * @param {Degrees} latitude - Latitude in degrees.
+ * @param {Degrees} longitude - Longitude in degrees.
  * @param {(jd: JulianDayTT) => CelestialCoordinates} coordFn - Coordinate function.
  * @returns {PositionData} Azimuth and altitude.
  */
 export function calculateCelestialPosition(
-  jd: JulianDayTT,
-  lat: Degrees,
-  lng: Degrees,
-  coordFn: (jd: JulianDayTT) => CelestialCoordinates,
+  time: JulianDayTT,
+  latitude: Degrees,
+  longitude: Degrees,
+  coordFn: (time: JulianDayTT) => CelestialCoordinates,
 ): PositionData {
-  const longitudeRadWest: Radians = longitudeToRadWest(lng);
-  const latitudeRad: Radians = latitudeToRad(lat);
-  const coordinates = coordFn(jd);
+  const longitudeRadWest: Radians = longitudeToRadWest(longitude);
+  const latitudeRad: Radians = latitudeToRad(latitude);
+  const coordinates = coordFn(time);
   const hourAngleRad: Radians = computeHourAngleAtRef(
-    jd,
+    time,
     longitudeRadWest,
-    coordinates.ra,
+    coordinates.rightAscension,
   );
   const geometricAltitudeRad: Radians = altitude(
     hourAngleRad,
     latitudeRad,
-    coordinates.dec,
+    coordinates.declination,
   );
   return {
-    azimuth: azimuth(hourAngleRad, latitudeRad, coordinates.dec),
+    azimuth: azimuth(hourAngleRad, latitudeRad, coordinates.declination),
     altitude: (geometricAltitudeRad +
       astroRefraction(geometricAltitudeRad)) as Radians,
   };
@@ -214,51 +268,52 @@ export function calculateCelestialPosition(
 
 /**
  * Calculates the true obliquity of the ecliptic.
- * @param {J2000CenturyTT} T - Julian centuries since J2000.
+ * @param {J2000CenturyTT} time - Julian centuries since J2000.
  * @returns {Radians} Obliquity in radians.
  */
 export function calculateTrueObliquity(T: J2000CenturyTT): Radians {
-  return ((EARTH.OBLIQUITY_J2000 + EARTH.OBLIQUITY_DRIFT.LINEAR_RATE * T) *
-    DEGREES_TO_RADIANS) as Radians;
+  return degreesToRadians(
+    (EARTH.OBLIQUITY_J2000 + EARTH.OBLIQUITY_DRIFT.LINEAR_RATE * T) as Degrees,
+  );
 }
 
 /**
  * Calculates right ascension from ecliptic coordinates.
- * @param λ - Ecliptic longitude in radians.
- * @param β - Ecliptic latitude in radians.
- * @param ε - Obliquity in radians.
+ * @param eclipticLongitude (λ) - Ecliptic longitude in radians.
+ * @param eclipticLatitude (β) - Ecliptic latitude in radians.
+ * @param obliquity (ε) - Obliquity in radians.
  * @returns Right ascension in radians.
  */
-export function rightAscension(
-  eclipticLonRad: Radians,
-  eclipticLatRad: Radians,
-  obliquityRad: Radians,
+export function getRightAscension(
+  eclipticLongitude: Radians,
+  eclipticLatitude: Radians,
+  obliquity: Radians,
 ): Radians {
   const x =
-    Math.sin(eclipticLonRad) * Math.cos(obliquityRad) -
-    Math.tan(eclipticLatRad) * Math.sin(obliquityRad);
-  const y = Math.cos(eclipticLonRad);
+    Math.sin(eclipticLongitude) * Math.cos(obliquity) -
+    Math.tan(eclipticLatitude) * Math.sin(obliquity);
+  const y = Math.cos(eclipticLongitude);
   const ra = Math.atan2(x, y);
   return ((ra < 0 ? ra + TAU : ra) % TAU) as Radians;
 }
 
 /**
  * Calculates declination from ecliptic coordinates.
- * @param λ - Ecliptic longitude in radians.
- * @param β - Ecliptic latitude in radians.
- * @param ε - Obliquity in radians.
+ * @param eclipticLongitude (λ) - Ecliptic longitude in radians.
+ * @param eclipticLatitude (β) - Ecliptic latitude in radians.
+ * @param obliquity (ε) - Obliquity in radians.
  * @returns Declination in radians.
  */
-export function declination(
-  eclipticLonRad: Radians,
-  eclipticLatRad: Radians,
-  obliquityRad: Radians,
+export function getDeclination(
+  eclipticLongitude: Radians,
+  eclipticLatitude: Radians,
+  obliquity: Radians,
 ): Radians {
   return Math.asin(
-    Math.sin(eclipticLatRad) * Math.cos(obliquityRad) +
-      Math.cos(eclipticLatRad) *
-        Math.sin(obliquityRad) *
-        Math.sin(eclipticLonRad),
+    Math.sin(eclipticLatitude) * Math.cos(obliquity) +
+      Math.cos(eclipticLatitude) *
+        Math.sin(obliquity) *
+        Math.sin(eclipticLongitude),
   ) as Radians;
 }
 
@@ -266,27 +321,28 @@ export function declination(
 
 /**
  * Applies Saemundsson's refraction model for altitude correction.
- * @param {Radians} h - Geometric altitude in radians.
+ * @param {Radians} geometricAltitude - Geometric altitude in radians.
  * @returns {Radians} Refraction adjustment in radians.
  */
-export function astroRefraction(geometricAltitudeRad: Radians): Radians {
-  const minAltRad: Radians = (REFRACTION.SAEMUNDSSON.MIN_ALTITUDE *
-    DEGREES_TO_RADIANS) as Radians;
-  const clampedAltitudeRad: Radians = Math.max(
-    geometricAltitudeRad,
+export function astroRefraction(geometricAltitude: Radians): Radians {
+  const minAltRad: Radians = degreesToRadians(
+    REFRACTION.SAEMUNDSSON.MIN_ALTITUDE,
+  );
+  const clampedAltitude: Radians = Math.max(
+    geometricAltitude,
     minAltRad,
   ) as Radians;
-  const clampedAltitudeDeg: Degrees = (clampedAltitudeRad *
-    (180 / PI)) as Degrees;
+  const clampedAltitudeDeg: Degrees = radiansToDegrees(clampedAltitude);
   const altitudeAdjustmentDeg =
     REFRACTION.SAEMUNDSSON.ALTITUDE_OFFSET /
     (clampedAltitudeDeg + REFRACTION.SAEMUNDSSON.DENOMINATOR_OFFSET);
   const adjustedAltitudeDeg: Degrees = (clampedAltitudeDeg +
     altitudeAdjustmentDeg) as Degrees;
-  const tanTerm = Math.tan(adjustedAltitudeDeg * DEGREES_TO_RADIANS);
+  const tanTerm = Math.tan(degreesToRadians(adjustedAltitudeDeg));
   return tanTerm !== 0
-    ? (((REFRACTION.SAEMUNDSSON.COEFFICIENT / tanTerm) *
-        DEGREES_TO_RADIANS) as Radians)
+    ? degreesToRadians(
+        (REFRACTION.SAEMUNDSSON.COEFFICIENT / tanTerm) as Degrees,
+      )
     : (0 as Radians);
 }
 
@@ -378,24 +434,24 @@ export function refineEvent(
 
 /**
  * Generates candidate event times.
- * @param {JulianDayTT} startJD - Start in Julian days (TT).
- * @param {JulianDayTT} endJD - End in Julian days (TT).
+ * @param {JulianDayTT} start - Start in Julian days (TT).
+ * @param {JulianDayTT} end - End in Julian days (TT).
  * @param {JulianDayTT} referenceJD - Anchor event JD.
  * @param {Days} eventIntervalDays - Period between events.
  * @param {Days} convergenceWindowDays - Refinement window.
  * @returns {JulianDayTT[]} Candidate JDs in TT.
  */
 export function generateEventSeeds(
-  startJD: JulianDayTT,
-  endJD: JulianDayTT,
+  start: JulianDayTT,
+  end: JulianDayTT,
   referenceJD: JulianDayTT,
   eventIntervalDays: Days,
   convergenceWindowDays: Days,
 ): JulianDayTT[] {
   const seeds: JulianDayTT[] = [];
 
-  // Compute the offset from referenceJD to startJD in days
-  const startPhaseOffset: Days = subtractJDs(referenceJD, startJD);
+  // Compute the offset from referenceJD to start in days
+  const startPhaseOffset: Days = subtractJDs(referenceJD, start);
 
   // Calculate how many intervals before referenceJD to cover startJD - convergenceWindowDays
   const seedCountBefore = Math.ceil(
@@ -409,9 +465,9 @@ export function generateEventSeeds(
   let jd: JulianDayTT = subtractDaysFromJD(referenceJD, initialOffset);
 
   // Define thresholds for the loop
-  const endThreshold: JulianDayTT = addDaysToJD(endJD, convergenceWindowDays);
+  const endThreshold: JulianDayTT = addDaysToJD(end, convergenceWindowDays);
   const startThreshold: JulianDayTT = subtractDaysFromJD(
-    startJD,
+    start,
     convergenceWindowDays,
   );
 
@@ -430,16 +486,16 @@ export function generateEventSeeds(
 
 /**
  * Adds a JD to an array if unique within threshold.
- * @param {JulianDayTT[]} jds - Array to modify.
+ * @param {JulianDayTT[]} times - Array to modify.
  * @param {JulianDayTT} jd - Candidate JD in TT.
  * @param {Days} [eps] - Equality threshold in days.
  */
 export function addUniqueJD(
-  jds: JulianDayTT[],
-  jd: JulianDayTT,
+  times: JulianDayTT[],
+  time: JulianDayTT,
   eps: Days = NUMERICAL.EPSILON.EVENT_TIME_EQUALITY_DAYS as Days,
 ): void {
-  if (!jds.some((existing) => Math.abs(existing - jd) < eps)) {
-    jds.push(jd);
+  if (!times.some((existing) => Math.abs(existing - time) < eps)) {
+    times.push(time);
   }
 }

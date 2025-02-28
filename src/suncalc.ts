@@ -6,7 +6,6 @@
  */
 
 import {
-  DEGREES_TO_RADIANS,
   NUMERICAL,
   PI,
   SOLAR_EVENT_DEFINITIONS,
@@ -22,6 +21,7 @@ import {
   azimuth,
   CelestialCoordinates,
   computeDerivative,
+  degreesToRadians,
   latitudeToRad,
   longitudeToRadWest,
   PositionData,
@@ -43,22 +43,28 @@ export type TimesData = {
 /**
  * Calculates the sun's celestial coordinates (RA and Dec) for a given Julian day in TT.
  */
-export function sunCoords(jd_tt: JulianDayTT): { ra: Radians; dec: Radians } {
+export function sunCoords(jd_tt: JulianDayTT): {
+  rightAscension: Radians;
+  declination: Radians;
+} {
   const coords = calculateSolarCoordinates(jd_tt);
-  return { ra: coords.ra as Radians, dec: coords.dec as Radians };
+  return {
+    rightAscension: coords.rightAscension,
+    declination: coords.declination,
+  };
 }
 
 /**
  * Calculates the rate of change of solar declination for transit time correction.
  */
 export function solarDeclinationRate(
-  jd_tt: JulianDayTT,
+  time: JulianDayTT,
   delta: Days = NUMERICAL.CALCULATION.DERIVATIVE_STEP_DAYS as Days,
 ): number {
-  const sunCoordsDecFn = (t: JulianDayTT) => sunCoords(t).dec as number;
+  const sunCoordsDecFn = (t: JulianDayTT) => sunCoords(t).declination as number;
   return computeDerivative(
     sunCoordsDecFn as (t: number) => number,
-    jd_tt,
+    time,
     delta,
     NUMERICAL.EPSILON.FLOATING_POINT_DAYS as number,
   );
@@ -82,18 +88,18 @@ export function addTime(
  * Calculates the sun's position for a given Julian day and observer location.
  */
 export function getPosition(
-  jd_tt: JulianDayTT,
+  time: JulianDayTT,
   lat: Degrees,
   lng: Degrees,
 ): PositionData {
   const lw = longitudeToRadWest(lng) as Radians;
   const phi = latitudeToRad(lat) as Radians;
-  const c = sunCoords(jd_tt);
-  const H = computeHourAngleAtRef(jd_tt, lw, c.ra) as Radians;
+  const c = sunCoords(time);
+  const H = computeHourAngleAtRef(time, lw, c.rightAscension) as Radians;
 
-  const geomAlt = altitude(H, phi, c.dec) as Radians;
+  const geomAlt = altitude(H, phi, c.declination) as Radians;
   return {
-    azimuth: azimuth(H, phi, c.dec) as Radians,
+    azimuth: azimuth(H, phi, c.declination) as Radians,
     altitude: (geomAlt + astroRefraction(geomAlt)) as Radians,
   };
 }
@@ -148,7 +154,7 @@ export function getTimes(
   const Jnoon = transitData.transitJD as JulianDayTT;
 
   const c = sunCoords(Jnoon);
-  const dec = c.dec as Radians;
+  const dec = c.declination as Radians;
 
   const result: TimesData = {
     solarNoon: Jnoon,
@@ -156,7 +162,7 @@ export function getTimes(
   };
 
   for (const [angle, riseName, setName] of times) {
-    const h = (angle * DEGREES_TO_RADIANS) as Radians;
+    const h = degreesToRadians(angle);
     const Jset = getSetJ(h, lw, phi, dec, Jnoon);
     const Jrise = (Jnoon - (Jset - Jnoon)) as JulianDayTT;
     result[riseName] = Jrise;

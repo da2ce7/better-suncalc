@@ -3,7 +3,7 @@
  * @description Constants related to the Moon's orbital and positional parameters.
  */
 
-import { AU, Days, Degrees, DegreesPerDay, JulianDayTT } from "./types";
+import { AU, Days, Degrees, DegreesPerJ2000DayTT, JulianDayTT } from "./types";
 
 /**
  * Constants related to the Moon's orbital and positional parameters.
@@ -51,7 +51,7 @@ export const LUNAR = {
      * @unit degrees/day
      * @description Daily motion of the Moon along its orbit.
      */
-    LONGITUDE: 13.176396 as DegreesPerDay, // Degrees/day
+    LONGITUDE: 13.176396 as DegreesPerJ2000DayTT, // Degrees/day
 
     /**
      * Rate of change of the Moon's mean anomaly.
@@ -59,7 +59,7 @@ export const LUNAR = {
      * @unit degrees/day
      * @description Daily change in anomaly.
      */
-    ANOMALY: 13.064993 as DegreesPerDay, // Degrees/day
+    ANOMALY: 13.064993 as DegreesPerJ2000DayTT, // Degrees/day
 
     /**
      * Rate of change of the Moon's mean argument of latitude.
@@ -67,7 +67,7 @@ export const LUNAR = {
      * @unit degrees/day
      * @description Daily change in latitude argument.
      */
-    ARG_LATITUDE: 13.22935 as DegreesPerDay, // Degrees/day
+    ARG_LATITUDE: 13.22935 as DegreesPerJ2000DayTT, // Degrees/day
   },
 
   /**

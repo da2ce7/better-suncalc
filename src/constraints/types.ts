@@ -142,10 +142,12 @@ export type Kilometers = number & { readonly __brand: "Kilometers" };
 export type AU = number & { readonly __brand: "AU" };
 
 /**
- * Represents a rate of change in degrees per day.
- * @typedef {number & { readonly __brand: "DegreesPerDay" }} DegreesPerDay
+ * Represents a rate of change in degrees per J2000DayTT.
+ * @typedef {number & { readonly __brand: "DegreesPerDay" }} DegreesPerJ2000DayTT
  */
-export type DegreesPerDay = number & { readonly __brand: "DegreesPerDay" };
+export type DegreesPerJ2000DayTT = number & {
+  readonly __brand: "DegreesPerJ2000DayTT";
+};
 
 /**
  * Represents a rate of change in degrees per Julian Centuries in Terrestrial Time (TT) since J2000.
@@ -185,8 +187,8 @@ export interface CelestialBodyConstants {
     meanAnomaly: Degrees;
   };
   motion: {
-    longitude: DegreesPerDay;
-    anomaly: DegreesPerDay;
+    longitude: DegreesPerJ2000DayTT;
+    anomaly: DegreesPerJ2000DayTT;
   };
   orbit: OrbitalParameters;
 }

@@ -22,12 +22,7 @@
  */
 
 import { SIDEREAL } from "./constraints/earth";
-import {
-  DEGREES_TO_RADIANS,
-  FULL_CIRCLE_DEGREES,
-  PI,
-  TAU,
-} from "./constraints/math";
+import { FULL_CIRCLE_DEGREES, PI, TAU } from "./constraints/math";
 import {
   DAYS_PER_JULIAN_CENTURY,
   HALF_DAY,
@@ -41,7 +36,7 @@ import {
   Radians,
 } from "./constraints/types";
 import { ttToUT1 } from "./terrestrialtime";
-import { CelestialCoordinates, refineEvent } from "./utils";
+import { CelestialCoordinates, degreesToRadians, refineEvent } from "./utils";
 
 // Update PreciseTransitData to use branded types
 export type PreciseTransitData = {
@@ -88,7 +83,7 @@ function getGSTRadians(jdTT: JulianDayTT): Radians {
   const gmstDegrees: Degrees = (((gmstDegreesNumber % FULL_CIRCLE_DEGREES) +
     FULL_CIRCLE_DEGREES) %
     FULL_CIRCLE_DEGREES) as Degrees;
-  return (gmstDegrees * DEGREES_TO_RADIANS) as Radians;
+  return degreesToRadians(gmstDegrees);
 }
 
 /**
@@ -97,18 +92,18 @@ function getGSTRadians(jdTT: JulianDayTT): Radians {
  *
  * @param {JulianDayTT} referenceJulianDayTT - Reference Julian Day in TT. Converted to UT1 internally.
  * @param {Radians} westLongitudeRadians - Observer’s longitude west in radians (positive west of Prime Meridian).
- * @param {Radians} raRadians - Right ascension of the celestial object in radians.
+ * @param {Radians} rightAscension - Right ascension of the celestial object in radians.
  * @returns {Radians} Hour angle in radians (0 ≤ H < 2π).
  */
 export function computeHourAngleAtRef(
   referenceJulianDayTT: JulianDayTT,
   westLongitudeRadians: Radians,
-  raRadians: Radians,
+  rightAscension: Radians,
 ): Radians {
   const gst: Radians = getGSTRadians(referenceJulianDayTT);
   const lst: Radians = ((((gst - westLongitudeRadians) % TAU) + TAU) %
     TAU) as Radians;
-  let hourAngle: Radians = ((lst - raRadians) % TAU) as Radians;
+  let hourAngle: Radians = ((lst - rightAscension) % TAU) as Radians;
   return hourAngle < 0 ? ((hourAngle + TAU) as Radians) : hourAngle;
 }
 
@@ -153,14 +148,14 @@ export function getPreciseTransitForCycle(
   const initialTransitEstimateJdTT: JulianDayTT = estimateTransitTime(
     westLongitudeRad,
     referenceCycleJdTT,
-    getObjectCoords(referenceCycleJdTT).ra,
+    getObjectCoords(referenceCycleJdTT).rightAscension,
   );
 
   const evaluator = (jd_tt: JulianDayTT): number => {
     const coords = getObjectCoords(jd_tt);
     const gmst: Radians = getGSTRadians(jd_tt);
     const lst: Radians = ((gmst - westLongitudeRad + TAU) % TAU) as Radians;
-    let diff = lst - coords.ra;
+    let diff = lst - coords.rightAscension;
     if (diff > PI) diff -= TAU;
     if (diff < -PI) diff += TAU;
     return diff;

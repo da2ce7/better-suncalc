@@ -5,12 +5,11 @@
 */
 
 import { LUNAR } from "./constraints/lunar";
-import { AU_TO_KM, DEGREES_TO_RADIANS, PI } from "./constraints/math";
-import { JULIAN_EPOCH_J2000 } from "./constraints/time";
+import { AU_TO_KM, PI } from "./constraints/math";
 import {
-  Days,
   Degrees,
   Hours,
+  J2000DayTT,
   JulianDayTT,
   Radians,
 } from "./constraints/types";
@@ -21,6 +20,8 @@ import {
   altitude,
   astroRefraction,
   azimuth,
+  degreesToRadians,
+  julianDayToJ2000Day,
   latitudeToRad,
   longitudeToRadWest,
 } from "./utils";
@@ -50,51 +51,55 @@ export type MoonTimesData = {
 /* ==================== Moon Calculations ==================== */
 
 export function getMoonPosition(
-  jd: JulianDayTT,
+  time: JulianDayTT,
   lat: Degrees,
   lng: Degrees,
 ): MoonPositionData {
   const lw = longitudeToRadWest(lng) as Radians;
   const phi = latitudeToRad(lat) as Radians;
-  const d = (jd - JULIAN_EPOCH_J2000) as Days;
+  const time_J2000: J2000DayTT = julianDayToJ2000Day(time);
 
-  const coords = calculateLunarCoordinates(jd);
-  const ra = coords.ra as Radians;
-  const dec = coords.dec as Radians;
+  const coords = calculateLunarCoordinates(time);
+  const rightAscension = coords.rightAscension as Radians;
+  const declination = coords.declination as Radians;
 
-  const M = (DEGREES_TO_RADIANS *
-    (LUNAR.EPOCH_J2000.MEAN_ANOMALY + LUNAR.MOTION.ANOMALY * d)) as Radians;
+  const M = degreesToRadians(
+    (LUNAR.EPOCH_J2000.MEAN_ANOMALY +
+      LUNAR.MOTION.ANOMALY * time_J2000) as Degrees,
+  );
   const meanDist = (LUNAR.ORBIT.SEMI_MAJOR_AXIS * AU_TO_KM) as number;
   const variationCoeff = (LUNAR.PERTURBATIONS.EVECTION_LONGITUDE_AMPLITUDE *
     meanDist) as number;
   const dist = (meanDist - variationCoeff * Math.cos(M)) as number;
 
-  const H = computeHourAngleAtRef(jd, lw, ra) as Radians;
-  let h = altitude(H, phi, dec) as Radians;
+  const H = computeHourAngleAtRef(time, lw, rightAscension) as Radians;
+  let h = altitude(H, phi, declination) as Radians;
   const pa = Math.atan2(
     Math.sin(H),
-    Math.tan(phi) * Math.cos(dec) - Math.sin(dec) * Math.cos(H),
+    Math.tan(phi) * Math.cos(declination) - Math.sin(declination) * Math.cos(H),
   ) as Radians;
 
   h = (h + astroRefraction(h)) as Radians;
 
   return {
-    azimuth: azimuth(H, phi, dec) as Radians,
+    azimuth: azimuth(H, phi, declination) as Radians,
     altitude: h,
     distance: dist,
     parallacticAngle: pa,
   };
 }
 
-export function getMoonIllumination(jd: JulianDayTT): MoonIlluminationData {
-  const d = (jd - JULIAN_EPOCH_J2000) as Days;
-  const s = sunCoords(jd);
-  const mCoords = calculateLunarCoordinates(jd);
-  const mRa = mCoords.ra as Radians;
-  const mDec = mCoords.dec as Radians;
+export function getMoonIllumination(time: JulianDayTT): MoonIlluminationData {
+  const time_j2000 = julianDayToJ2000Day(time);
+  const s = sunCoords(time);
+  const mCoords = calculateLunarCoordinates(time);
+  const mRa = mCoords.rightAscension as Radians;
+  const mDec = mCoords.declination as Radians;
 
-  const M = (DEGREES_TO_RADIANS *
-    (LUNAR.EPOCH_J2000.MEAN_ANOMALY + LUNAR.MOTION.ANOMALY * d)) as Radians;
+  const M = degreesToRadians(
+    (LUNAR.EPOCH_J2000.MEAN_ANOMALY +
+      LUNAR.MOTION.ANOMALY * time_j2000) as Degrees,
+  );
   const meanDist = (LUNAR.ORBIT.SEMI_MAJOR_AXIS * AU_TO_KM) as number;
   const variationCoeff = (LUNAR.PERTURBATIONS.EVECTION_LONGITUDE_AMPLITUDE *
     meanDist) as number;
@@ -102,17 +107,21 @@ export function getMoonIllumination(jd: JulianDayTT): MoonIlluminationData {
 
   const sdist = (1 * AU_TO_KM) as number;
   const phi = Math.acos(
-    Math.sin(s.dec) * Math.sin(mDec) +
-      Math.cos(s.dec) * Math.cos(mDec) * Math.cos(s.ra - mRa),
+    Math.sin(s.declination) * Math.sin(mDec) +
+      Math.cos(s.declination) *
+        Math.cos(mDec) *
+        Math.cos(s.rightAscension - mRa),
   ) as Radians;
   const inc = Math.atan2(
     sdist * Math.sin(phi),
     mDist - sdist * Math.cos(phi),
   ) as Radians;
   const angle = Math.atan2(
-    Math.cos(s.dec) * Math.sin(s.ra - mRa),
-    Math.sin(s.dec) * Math.cos(mDec) -
-      Math.cos(s.dec) * Math.sin(mDec) * Math.cos(s.ra - mRa),
+    Math.cos(s.declination) * Math.sin(s.rightAscension - mRa),
+    Math.sin(s.declination) * Math.cos(mDec) -
+      Math.cos(s.declination) *
+        Math.sin(mDec) *
+        Math.cos(s.rightAscension - mRa),
   ) as Radians;
 
   return {
@@ -127,8 +136,7 @@ export function getMoonTimes(
   lat: Degrees,
   lng: Degrees,
 ): MoonTimesData {
-  const hc = (LUNAR.VISIBILITY.ALTITUDE_THRESHOLD *
-    DEGREES_TO_RADIANS) as Radians;
+  const hc = degreesToRadians(LUNAR.VISIBILITY.ALTITUDE_THRESHOLD);
 
   let previousAlt = (getMoonPosition(startJD, lat, lng).altitude -
     hc) as Radians;

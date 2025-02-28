@@ -7,9 +7,9 @@ import { JULIAN_EPOCH_J2000 } from "./time";
 import {
   Days,
   Degrees,
-  DegreesPerDay,
   DegreesPerJ2000CenturyTT,
   DegreesPerJ2000CenturyTT_Squared,
+  DegreesPerJ2000DayTT,
   JulianDayTT,
 } from "./types";
 
@@ -134,7 +134,7 @@ export const SIDEREAL = {
      * @unit degrees/day
      * @description Rate of change of sidereal time per solar day.
      */
-    DRIFT_RATE: 360.98564736628 as DegreesPerDay, // Degrees/day
+    DRIFT_RATE: 360.98564736628 as DegreesPerJ2000DayTT, // Degrees/day
 
     T_SQUARED_COEFF: 0.000387933 as DegreesPerJ2000CenturyTT_Squared,
     T_CUBED_DIVISOR: 38710000, // dimensionless divisor for T^3 term

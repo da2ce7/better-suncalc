@@ -3,7 +3,11 @@
  * @description Constants related to the Sun's orbital and positional model.
  */
 
-import { Degrees, DegreesPerDay, DegreesPerJ2000CenturyTT } from "./types";
+import {
+  Degrees,
+  DegreesPerJ2000CenturyTT,
+  DegreesPerJ2000DayTT,
+} from "./types";
 
 /**
  * Constants related to the Sun's orbital and positional model.
@@ -52,7 +56,7 @@ export const SOLAR = {
      * @unit degrees/day
      * @description Daily motion of the Sun along the ecliptic.
      */
-    LONGITUDE: 0.98564736 as DegreesPerDay, // Degrees per day
+    LONGITUDE: 0.98564736 as DegreesPerJ2000DayTT, // Degrees per day
 
     /**
      * Rate of change of the Sun's mean anomaly.
@@ -60,7 +64,7 @@ export const SOLAR = {
      * @unit degrees/day
      * @description Daily change in anomaly.
      */
-    ANOMALY: 0.98560028 as DegreesPerDay, // Degrees per day
+    ANOMALY: 0.98560028 as DegreesPerJ2000DayTT, // Degrees per day
 
     /**
      * Centurial rate of change of the Sun's mean longitude.

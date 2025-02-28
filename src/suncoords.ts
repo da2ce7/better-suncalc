@@ -5,7 +5,6 @@
  */
 
 import { EARTH } from "./constraints/earth";
-import { DEGREES_TO_RADIANS } from "./constraints/math";
 import { SOLAR } from "./constraints/solar";
 import {
   DAYS_PER_JULIAN_CENTURY,
@@ -22,9 +21,10 @@ import {
 import {
   calculateTrueObliquity,
   CelestialCoordinates,
-  declination,
+  degreesToRadians,
+  getDeclination,
   getJulianCenturiesSinceJ2000,
-  rightAscension,
+  getRightAscension,
 } from "./utils";
 
 /* ==================== Coordinate Calculations ==================== */
@@ -45,12 +45,12 @@ export function calculateSolarCoordinates(
   const M_rad: Radians = solarMeanAnomaly(jd_tt); // Mean anomaly in radians
   const eclipticLon_rad: Radians = eclipticLongitude(jd_tt);
   const epsilon_rad: Radians = calculateTrueObliquity(T);
-  const ra_rad: Radians = rightAscension(
+  const rightAscension: Radians = getRightAscension(
     eclipticLon_rad,
     0 as Radians,
     epsilon_rad,
   );
-  const dec_rad: Radians = declination(
+  const declination: Radians = getDeclination(
     eclipticLon_rad,
     0 as Radians,
     epsilon_rad,
@@ -58,11 +58,11 @@ export function calculateSolarCoordinates(
   const distance: AU = (1 - EARTH.ORBIT.ECCENTRICITY * Math.cos(M_rad)) as AU; // Distance in AU
 
   return {
-    ra: ra_rad,
-    dec: dec_rad,
+    rightAscension: rightAscension,
+    declination: declination,
     distance,
-    eclipticLon: eclipticLon_rad,
-    eclipticLat: 0 as Radians,
+    eclipticLongitude: eclipticLon_rad,
+    eclipticLatitude: 0 as Radians,
   };
 }
 
@@ -81,7 +81,7 @@ export function solarMeanAnomaly(jd_tt: JulianDayTT): Radians {
   if (meanAnomalyDegNormalized < 0) {
     meanAnomalyDegNormalized = (meanAnomalyDegNormalized + 360) as Degrees; // Ensure [0, 360)
   }
-  return (meanAnomalyDegNormalized * DEGREES_TO_RADIANS) as Radians;
+  return degreesToRadians(meanAnomalyDegNormalized);
 }
 
 /**
@@ -104,5 +104,5 @@ export function eclipticLongitude(jd_tt: JulianDayTT): Radians {
   if (trueLongitude_deg < 0) {
     trueLongitude_deg = (trueLongitude_deg + 360) as Degrees; // Ensure [0, 360)
   }
-  return (trueLongitude_deg * DEGREES_TO_RADIANS) as Radians;
+  return degreesToRadians(trueLongitude_deg);
 }
