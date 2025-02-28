@@ -11,6 +11,7 @@ import {
   DegreesPerJ2000CenturyTT_Squared,
   DegreesPerJ2000DayTT,
   JulianDayTT,
+  Meters,
 } from "./types";
 
 /** =============== Earth Orientation and Orbital Parameters ================ */
@@ -107,6 +108,58 @@ export const EARTH = {
     TROPICAL_YEAR: 365.2422 as Days, // Days
   },
 };
+
+/** ================ Geodetic Parameters ================ */
+
+/**
+ * Geodetic reference systems and parameters compliant with WGS84.
+ * @constant {Object}
+ */
+export const GEODETIC = {
+  /**
+   * World Geodetic System 1984 (WGS84) geodetic parameters.
+   * @constant {Object}
+   * @see [NIMA TR8350.2](https://earth-info.nga.mil/).
+   */
+  WGS84: {
+    /**
+     * Semi-major axis of the Earth's ellipsoid (equatorial radius).
+     * @unit meters
+     */
+    a: 6378137.0 as Meters,
+    /**
+     * Flattening factor of the Earth's ellipsoid: (a - e) / a.
+     * @unit unitless
+     */
+    f: 1 / 298.257223563,
+    /**
+     * Theoretical gravity at the equator (including centrifugal force).
+     * @unit meters per second squared (m/s²)
+     */
+    gravityEquator: 9.7803267714,
+    /**
+     * Theoretical gravity at the poles (including centrifugal force).
+     * @unit meters per second squared (m/s²)
+     */
+    gravityPole: 9.8321863685,
+    /**
+     * First eccentricity squared (e²) of the ellipsoid.
+     * @unit unitless
+     */
+    e2: 0.00669437999014,
+
+    /**
+     * Closed-form gravity expansion coefficient (k) derived from WGS84 parameters.
+     * @unit unitless
+     * @see Derived via:
+     * k = ( (b * γ_p) / (a * γ_e) ) - 1
+     * where b is semi-minor axis (a * (1 - f)).
+     * @example
+     * k ≈ 0.00193185138639
+     */
+    gravityCoefficientKg: 0.00193185138639,
+  } as const,
+} as const;
 
 /** ================ Sidereal Time and Earth Rotation ================= */
 

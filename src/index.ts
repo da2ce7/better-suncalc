@@ -10,21 +10,11 @@
 /** Re-exports from utils.ts */
 export {
   addUniqueJD,
-  altitude,
   astroRefraction,
-  azimuth,
   calculateCelestialPosition,
-  computeDerivative,
-  dateToJulian,
-  DEFAULT_REFINEMENT,
   EventWindow,
   generateEventSeeds,
-  julianToDate,
-  latitudeToRad,
-  longitudeToRadWest,
   PositionData,
-  refineEvent,
-  RefinementConfig,
 } from "./utils";
 
 /** Re-exports from suncalc.ts */

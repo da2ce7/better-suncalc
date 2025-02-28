@@ -11,20 +11,19 @@ import {
   Hours,
   J2000DayTT,
   JulianDayTT,
+  Kilometers,
   Radians,
 } from "./constraints/types";
 import { calculateLunarCoordinates } from "./mooncoords";
 import { sunCoords } from "./suncalc";
 import { computeHourAngleAtRef } from "./transits";
 import {
-  altitude,
-  astroRefraction,
-  azimuth,
-  degreesToRadians,
   julianDayToJ2000Day,
   latitudeToRad,
   longitudeToRadWest,
-} from "./utils";
+} from "./utilities/austomath";
+import { altitude, azimuth, degreesToRadians } from "./utilities/trigonometry";
+import { astroRefraction } from "./utils";
 
 /* ==================== Moon Types ==================== */
 
@@ -67,7 +66,7 @@ export function getMoonPosition(
     (LUNAR.EPOCH_J2000.MEAN_ANOMALY +
       LUNAR.MOTION.ANOMALY * time_J2000) as Degrees,
   );
-  const meanDist = (LUNAR.ORBIT.SEMI_MAJOR_AXIS * AU_TO_KM) as number;
+  const meanDist = (LUNAR.ORBIT.SEMI_MAJOR_AXIS * AU_TO_KM) as Kilometers;
   const variationCoeff = (LUNAR.PERTURBATIONS.EVECTION_LONGITUDE_AMPLITUDE *
     meanDist) as number;
   const dist = (meanDist - variationCoeff * Math.cos(M)) as number;

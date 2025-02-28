@@ -106,4 +106,17 @@ export const TIME_UNITS = {
      */
     DAY: 24 as Hours, // 1 day = 24 hours
   },
+
+  /**
+   * Days conversions.
+   * @constant {Object}
+   */
+  DAYS: {
+    /**
+     * Days per Julian century as defined by IAU (36525 days)
+     * @constant {Hours}
+     * @unit hours
+     */
+    CENTURY: 36525 as Hours, // 1 day = 24 hours
+  },
 };

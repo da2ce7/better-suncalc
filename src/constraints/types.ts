@@ -130,6 +130,12 @@ export type DegreesPerJulianCenturyUT1_Squared = number & {
 };
 
 /**
+ * Represents a distance in Meters.
+ * @typedef {number & { readonly __brand: "Kilometers" }} Meters
+ */
+export type Meters = number & { readonly __brand: "Meters" };
+
+/**
  * Represents a distance in Kilometers.
  * @typedef {number & { readonly __brand: "Kilometers" }} Kilometers
  */
@@ -142,11 +148,19 @@ export type Kilometers = number & { readonly __brand: "Kilometers" };
 export type AU = number & { readonly __brand: "AU" };
 
 /**
- * Represents a rate of change in degrees per J2000DayTT.
- * @typedef {number & { readonly __brand: "DegreesPerDay" }} DegreesPerJ2000DayTT
+ * Represents a rate of change in Degrees per J2000DayTT in .
+ * @typedef {number & { readonly __brand: "DegreesPerJ2000DayTT" }} DegreesPerJ2000DayTT
  */
 export type DegreesPerJ2000DayTT = number & {
   readonly __brand: "DegreesPerJ2000DayTT";
+};
+
+/**
+ * Represents a rate of change in Radians per J2000DayTT.
+ * @typedef {number & { readonly __brand: "RadiansPerJ2000DayTT" }} RadiansPerJ2000DayTT
+ */
+export type RadiansPerJ2000DayTT = number & {
+  readonly __brand: "RadiansPerJ2000DayTT";
 };
 
 /**
@@ -168,27 +182,4 @@ export interface OrbitalParameters {
   eccentricity: number; // Unitless
   inclination: Degrees;
   semiMajorAxis: AU;
-}
-
-/**
- * Represents constants for celestial bodies.
- * @interface CelestialBodyConstants
- * @property {Object} epoch - Epoch-specific parameters.
- * @property {Degrees} epoch.meanLongitude - Mean longitude at the epoch.
- * @property {Degrees} epoch.meanAnomaly - Mean anomaly at the epoch.
- * @property {Object} motion - Motion rates.
- * @property {DegreesPerDay} motion.longitude - Rate of change of mean longitude.
- * @property {DegreesPerDay} motion.anomaly - Rate of change of mean anomaly.
- * @property {OrbitalParameters} orbit - Orbital parameters.
- */
-export interface CelestialBodyConstants {
-  epoch: {
-    meanLongitude: Degrees;
-    meanAnomaly: Degrees;
-  };
-  motion: {
-    longitude: DegreesPerJ2000DayTT;
-    anomaly: DegreesPerJ2000DayTT;
-  };
-  orbit: OrbitalParameters;
 }

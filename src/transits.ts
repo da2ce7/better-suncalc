@@ -35,7 +35,7 @@ import {
   JulianDayUT1,
   Radians,
 } from "./constraints/types";
-import { ttToUT1 } from "./terrestrialtime";
+import { ttToUT1 } from "./utilities/terrestrialtime";
 import { CelestialCoordinates, degreesToRadians, refineEvent } from "./utils";
 
 // Update PreciseTransitData to use branded types
