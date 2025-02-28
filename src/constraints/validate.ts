@@ -2,8 +2,8 @@
  * @file constraints/validate.ts
  */
 
-import { EARTH } from "./earth";
-import { LUNAR } from "./lunar";
+import { EARTH } from "./constants/earth";
+import { LUNAR } from "./constants/lunar";
 import { SOLAR } from "./solar";
 
 // Verify key astronomical relationships

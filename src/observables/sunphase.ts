@@ -11,12 +11,15 @@
  * @warning Accuracy may degrade over very long time spans due to variations in Earth's orbit.
  */
 
-import { EARTH } from "./constraints/earth";
-import { PI, TAU } from "./constraints/math";
-import { JULIAN_EPOCH_J2000 } from "./constraints/time";
-import { Days, JulianDayTT, Radians } from "./constraints/types";
-import { eclipticLongitude } from "./suncoords";
-import { addUniqueJD, generateEventSeeds, refineEvent } from "./utils";
+import { EARTH } from "../constraints/constants/earth";
+import { JULIAN_EPOCH_J2000 } from "../constraints/constants/time";
+import { PI, TAU } from "../constraints/math";
+import { Days, JulianDayTT, Radians } from "../constraints/types";
+import {
+  addUniqueJulianDate,
+  generateEventCandidates,
+} from "../events/celestial/seed-finders";
+import { eclipticLongitude } from "../suncoords";
 
 /**
  * Finds all times within a JD TT range when the sun is at a specified phase.
@@ -47,7 +50,7 @@ export function getSunPhases(
     targetPhase * EARTH.ORBIT.TROPICAL_YEAR) as JulianDayTT;
 
   // Generate approximate seed times for the phase events within the range
-  const seeds = generateEventSeeds(
+  const seeds = generateEventCandidates(
     startJD,
     endJD,
     EARTH.SEASONAL_EVENTS.VERNAL_EQUINOX_2000 as JulianDayTT,
@@ -85,7 +88,7 @@ export function getSunPhases(
 
     // Add the refined JD to results if it falls within the specified range
     if (jdRefined >= startJD && jdRefined <= endJD) {
-      addUniqueJD(results, jdRefined);
+      addUniqueJulianDate(results, jdRefined);
     }
   }
 

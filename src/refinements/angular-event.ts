@@ -5,7 +5,7 @@
 
 import { AngularEventConfig } from "../constraints/refinements";
 import { Days, Radians } from "../constraints/types";
-import { refineRoot } from "../utilities/findroot";
+import { refineRoot } from "../math/root-finders/newton-raphson";
 
 export function refineAngularEvent(
   initialEstimate: Days,

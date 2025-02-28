@@ -4,7 +4,7 @@
   All temporal parameters and results are in Terrestrial Time (TT) Julian days.
 */
 
-import { LUNAR } from "./constraints/lunar";
+import { LUNAR } from "./constraints/constants/lunar";
 import { AU_TO_KM, PI } from "./constraints/math";
 import {
   Degrees,
@@ -14,16 +14,20 @@ import {
   Kilometers,
   Radians,
 } from "./constraints/types";
-import { calculateLunarCoordinates } from "./mooncoords";
-import { sunCoords } from "./suncalc";
-import { computeHourAngleAtRef } from "./transits";
+import { applyStandardRefraction } from "./ephemerides/terrestrial/refraction";
+import { computeHourAngleAtRef } from "./events/celestial/transits";
 import {
   julianDayToJ2000Day,
   latitudeToRad,
   longitudeToRadWest,
-} from "./utilities/austomath";
-import { altitude, azimuth, degreesToRadians } from "./utilities/trigonometry";
-import { astroRefraction } from "./utils";
+} from "./math/austomath";
+import {
+  altitude,
+  azimuth,
+  degreesToRadians,
+} from "./math/trigonometry/trigonometry";
+import { calculateLunarCoordinates } from "./mooncoords";
+import { sunCoords } from "./suncalc";
 
 /* ==================== Moon Types ==================== */
 
@@ -78,7 +82,7 @@ export function getMoonPosition(
     Math.tan(phi) * Math.cos(declination) - Math.sin(declination) * Math.cos(H),
   ) as Radians;
 
-  h = (h + astroRefraction(h)) as Radians;
+  h = (h + applyStandardRefraction(h)) as Radians;
 
   return {
     azimuth: azimuth(H, phi, declination) as Radians,

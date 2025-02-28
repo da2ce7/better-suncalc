@@ -1,6 +1,6 @@
 // trigonometry
 
-import { Degrees, Radians } from "../constraints/types";
+import { Degrees, Radians } from "../../constraints/types";
 
 /**
  * Converts a value from degrees to radians.

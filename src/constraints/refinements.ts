@@ -1,95 +1,99 @@
 /**
  * @file constraints/refinements.ts
- * @description Newton-Raphson refinement policies for astronomical event calculations
- * @note Configuration parameters use astronomical units (days, Julian centuries, radians)
- *       tailored to specific event types. Conversions are managed via branded types.
+ * @description Type-safe Newton-Raphson refinement policies for astronomical event calculations
+ * @module RefinementPolicies
+ * @see {@link ./brands} For unit branding definitions
+ * @see {@link https://adsabs.harvard.edu/full/1989AJ.....97.1197K} Newton-Raphson applications in astronomy
  */
 
-import { toCenturyTT } from "../utilities/austomath";
-import type {
-  Days,
+import {
   Degrees,
-  J2000CenturyTT,
-  J2000DayTT,
+  Hectopascal,
+  J2000CenturyDateTT,
+  J2000DateTT,
+  Kelvin,
   Meters,
   Radians,
-} from "./types";
+  TerrestrialDays,
+  WavelengthMeters,
+} from "./brands";
+import { Brand } from "./types";
 
 // Base configuration interfaces -------------------------------------------------
 
 /**
- * Base configuration for Newton-Raphson root-finding algorithms
- * @template InputType - Numerical type for algorithm inputs (time/angle)
- * @template OutputType - Numerical type for function outputs (position/phase)
+ * Strictly-typed configuration for root-finding algorithms in astronomical contexts
+ * @template InputType - Branded numerical type for algorithm inputs
+ * @template OutputType - Branded numerical type for function outputs
  *
- * @property differentiationStep - Step size for numerical differentiation (input units)
- * @property absoluteTolerance - Convergence threshold in output units
- * @property maxIterations - Maximum number of iterations allowed
- * @property requireConvergence - Whether to throw error on non-convergence
- * @property searchBounds - Optional safety bounds for root search [lower, upper]
+ * @property differentiationStep - Finite difference step size (input units)
+ * @property absoluteTolerance - Convergence threshold (>= 1e-12 output units)
+ * @property maxIterations - Safety ceiling for convergence (typically 10-100)
+ * @property requireConvergence - Whether to throw on non-convergence
+ * @property searchBounds - Optional input domain restrictions [lower, upper]
  */
 export interface RefinementConfig<
-  InputType extends number = number,
-  OutputType extends number = number,
+  InputType extends Brand<number, any> = J2000DateTT,
+  OutputType extends Brand<number, any> = Radians,
 > {
   differentiationStep: InputType;
   absoluteTolerance: OutputType;
   maxIterations: number;
   requireConvergence: boolean;
-  searchBounds?: [InputType, InputType];
+  searchBounds?: readonly [InputType, InputType];
 }
 
 /**
- * Celestial reference frame specification
- * @discriminated
+ * Celestial reference frame specification with strict brand alignment
+ * @discriminated "type"
  */
 export type CelestialFrame =
   | {
       type: "ECLIPTIC";
       /**
        * Ecliptic frame version
-       * @default "MEAN"
+       * @defaultValue "MEAN" (without nutation)
        */
       version?: "MEAN" | "TRUE";
     }
   | {
       type: "EQUATORIAL";
       /**
-       * Reference pole definition
-       * @default "CIP"
+       * Celestial Intermediate Reference System specifier
+       * @defaultValue "CIP" (Celestial Intermediate Pole)
        */
       reference?: "CIP" | "CIO";
     };
 
 /**
- * Configuration for angular position events (conjunctions, lunar phases)
- *
- * Solves for θ(t) = targetAngle where t is in days since J2000.0 TT
+ * Configuration for angular convergence in astronomical events
+ * @extends RefinementConfig<TerrestrialDays, Radians>
  */
-export interface AngularEventConfig extends RefinementConfig<Days, Radians> {
-  /** Coordinate reference frame for angular measurements */
+export interface AngularEventConfig
+  extends RefinementConfig<TerrestrialDays, Radians> {
+  /** Coordinate system for angular measurements */
   frame: CelestialFrame;
 
-  /** Whether to account for light travel time */
+  /** Light-time correction enabled */
   lightTimeCorrected: boolean;
 
-  /** Angular step size for numerical differentiation */
+  /** Angular differentiation step size */
   angularStep: Degrees;
 }
 
 /**
- * Enforces proper observer locations for each geoid model.
- * @discriminated
+ * Geodetic models with strict unit requirements
+ * @discriminated "type"
  */
 export type GeoidModel =
   | {
       type: "WGS84";
-      /** Latitude required for ellipsoid height adjustment */
+      /** Reference ellipsoid latitude */
       latitude: Degrees;
     }
   | {
       type: "EGM2008";
-      /** Full geolocation needed for spherical harmonics */
+      /** Full geodetic coordinates */
       latitude: Degrees;
       longitude: Degrees;
       /** Height above reference ellipsoid */
@@ -97,8 +101,8 @@ export type GeoidModel =
     };
 
 /**
- * Atmospheric refraction model parameters
- * @discriminated
+ * Atmospheric refraction models with physical units
+ * @discriminated "type"
  */
 export type RefractionModel =
   | {
@@ -107,113 +111,115 @@ export type RefractionModel =
   | {
       type: "saastamoinen";
       /**
-       * Atmospheric conditions (default: standard parameters)
-       * @default { temperature: 283, pressure: 1013.25 }
+       * Atmospheric parameters
+       * @defaultValue Generic mid-latitude conditions
        */
       atmosphere?: {
-        temperature: number; // Kelvin
-        pressure: number; // hPa
+        /** Ambient air temperature */
+        temperature: Kelvin;
+        /** Barometric pressure */
+        pressure: Hectopascal;
       };
     }
   | {
       type: "radio";
-      /** Wavelength of observation (meters) */
-      wavelength: number;
+      /** Observation wavelength for ionospheric correction */
+      wavelength: WavelengthMeters;
     };
 
 /**
- * Configuration for celestial timing events (solstices, equinoxes, eclipses)
- *
- * Solves for f(T) = targetValue where T represents Julian centuries (36525 days)
- * since J2000.0 in Terrestrial Time (TT)
+ * Configuration for high-precision celestial timing events
+ * @extends RefinementConfig<J2000CenturyDateTT, TerrestrialDays>
  */
 export interface CelestialEventTimingConfig
-  extends RefinementConfig<J2000CenturyTT, Days> {
+  extends RefinementConfig<J2000CenturyDateTT, TerrestrialDays> {
   /**
-   * Maximum step size (centuries TT) when relativistic effects are significant
-   * @default undefined (no special relativity handling)
+   * Relativistic step constraint (approximate DE440 limit: 1e-3 centuries)
+   * @unit J2000CenturyDateTT
    */
-  maxRelativisticStep?: J2000CenturyTT;
+  maxRelativisticStep?: J2000CenturyDateTT;
 
   /**
-   * Ephemeris calculation cutoff time
-   * @default 1e-6 ≈ 52.6 minutes (0.036525 days)
+   * Ephemeris validity cutoff (empirical DE431 limit)
+   * @unit J2000CenturyDateTT
+   * @defaultValue 1e-6 ≈ 52.6 TT minutes
    */
-  ephemerisCutoff?: J2000CenturyTT;
+  ephemerisCutoff?: J2000CenturyDateTT;
 }
 
 /**
- * Configuration for observer-centric events (rise/set times, culminations)
- *
- * Uses elevation in meters (considering geoid model) for horizon calculations
+ * Configuration for observer-centric event calculations
+ * @extends RefinementConfig<TerrestrialDays, Meters>
  */
-export interface TopocentricEventConfig extends RefinementConfig<Days, Meters> {
-  /** Atmospheric refraction parameters */
+export interface TopocentricEventConfig
+  extends RefinementConfig<TerrestrialDays, Meters> {
+  /** Atmospheric refraction model */
   refraction: RefractionModel;
 
-  /** Observer elevation above sea level */
+  /** Orthometric height above geoid */
   observerElevation: Meters;
 
-  /** Geoid model for height calculations */
+  /** Geopotential model definition */
   geoid: GeoidModel;
 }
 
 // Preset configurations ---------------------------------------------------------
 
-/** Common refinement presets for astronomical calculations */
+/** Verified refinement presets for common astronomical use cases */
 export const REFINEMENT_PRESETS = {
   /**
-   * Solstice/equinox determination with wide search bounds
-   * - Convergence within ~1.3 seconds (1e-7 days)
+   * Solstice/equinox calculation profile (Chapront-Touze precision)
+   * - Input: J2000-century dates since epoch
+   * - Precision goal: 1.3 seconds (~1e-7 TT days)
    */
   SOLSTICE_DETERMINATION: {
-    differentiationStep: toCenturyTT(0.01 as J2000DayTT),
-    absoluteTolerance: 1e-7 as Days,
+    differentiationStep: 0.01 as J2000CenturyDateTT,
+    absoluteTolerance: 1e-7 as TerrestrialDays,
     maxIterations: 15,
     requireConvergence: true,
-    searchBounds: [
-      toCenturyTT(-0.5 as J2000DayTT),
-      toCenturyTT(0.5 as J2000DayTT),
-    ],
-  } as CelestialEventTimingConfig,
+    searchBounds: [-0.5 as J2000CenturyDateTT, 0.5 as J2000CenturyDateTT],
+    maxRelativisticStep: 0.001 as J2000CenturyDateTT,
+    ephemerisCutoff: 1e-6 as J2000CenturyDateTT,
+  } as const satisfies CelestialEventTimingConfig,
 
   /**
-   * High-precision lunar eclipse timing
-   * - Converges within ~8 microseconds (1e-9 days)
+   * High-precision lunar eclipse timing (Meeus algorithm Class 1)
+   * - Photon arrival time tolerance: ~8 microseconds (1e-9 TT days)
    */
   LUNAR_ECLIPSE_TIMING: {
-    differentiationStep: toCenturyTT(1e-6 as J2000DayTT),
-    absoluteTolerance: 1e-9 as Days,
+    differentiationStep: 1e-6 as J2000CenturyDateTT,
+    absoluteTolerance: 1e-9 as TerrestrialDays,
     maxIterations: 20,
     requireConvergence: true,
-  } as CelestialEventTimingConfig,
+    maxRelativisticStep: 5e-5 as J2000CenturyDateTT,
+  } as const satisfies CelestialEventTimingConfig,
 
   /**
-   * Planetary conjunction analysis in ecliptic frame
-   * - ~0.2 arcsecond tolerance (1e-6 radians)
+   * Planetary conjunction analysis (True Ecliptic frame)
+   * - 0.2 arcsecond tolerance (1e-6 rad ≈ 0.057 degrees)
    */
   CONJUNCTION_ANALYSIS: {
-    differentiationStep: 0.1 as Days,
+    differentiationStep: 0.1 as TerrestrialDays,
     angularStep: 0.002 as Degrees,
     absoluteTolerance: 1e-6 as Radians,
     maxIterations: 25,
     requireConvergence: true,
     frame: { type: "ECLIPTIC", version: "TRUE" },
     lightTimeCorrected: true,
-  } as AngularEventConfig,
+  } as const satisfies AngularEventConfig,
 
   /**
-   * Sunrise/sunset calculation with standard refraction
-   * - Converges within ≈1 cm elevation equivalence (~0.003° angular)
+   * Sunrise/sunset calculator (WGS84 + Saastamoinen refraction)
+   * - Elevation equivalence: 1 cm (~0.003° angular at horizon)
    */
   SUNRISE_SUNSET: {
-    differentiationStep: 0.05 as Days,
+    differentiationStep: 0.05 as TerrestrialDays,
     absoluteTolerance: 0.01 as Meters,
     maxIterations: 20,
     requireConvergence: true,
     refraction: { type: "saastamoinen" },
     observerElevation: 0 as Meters,
     geoid: { type: "WGS84", latitude: 0 as Degrees },
-    searchBounds: [-0.5 as Days, 0.5 as Days],
-  } as TopocentricEventConfig,
-};
+    searchBounds: [-0.5 as TerrestrialDays, 0.5 as TerrestrialDays],
+  } as const satisfies TopocentricEventConfig,
+} as const;

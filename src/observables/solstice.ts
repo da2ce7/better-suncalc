@@ -8,7 +8,7 @@
  * @warning Accuracy may degrade over very long time spans (e.g., ±10,000 years) due to variations in Earth's orbit.
  */
 
-import { JulianDayTT } from "./constraints/types";
+import { JulianDayTT } from "../constraints/types";
 import { getSunPhases } from "./sunphase";
 
 // Define the SolsticeData type with branded JulianDayTT

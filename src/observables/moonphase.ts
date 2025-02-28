@@ -7,11 +7,14 @@
  * @warning Accuracy may degrade over very long time spans due to perturbations in the moon's orbit.
  */
 
-import { LUNAR } from "./constraints/lunar";
-import { JULIAN_EPOCH_J2000 } from "./constraints/time";
-import { Days, JulianDayTT } from "./constraints/types";
-import { getMoonIllumination } from "./mooncalc";
-import { addUniqueJD, generateEventSeeds, refineEvent } from "./utils";
+import { LUNAR } from "../constraints/constants/lunar";
+import { JULIAN_EPOCH_J2000 } from "../constraints/constants/time";
+import { Days, JulianDayTT } from "../constraints/types";
+import {
+  addUniqueJulianDate,
+  generateEventCandidates,
+} from "../events/celestial/seed-finders";
+import { getMoonIllumination } from "../mooncalc";
 
 /**
  * Finds all times within a JD TT range when the moon is at a specified phase.
@@ -45,7 +48,7 @@ export function getMoonPhases(
   );
 
   // Generate approximate seed times for the target phase events
-  const seeds: JulianDayTT[] = generateEventSeeds(
+  const seeds: JulianDayTT[] = generateEventCandidates(
     start,
     end,
     referenceJD,
@@ -75,7 +78,7 @@ export function getMoonPhases(
 
     // Include the refined JD if it falls within the specified range
     if (jdRefined >= start && jdRefined <= end) {
-      addUniqueJD(results, jdRefined);
+      addUniqueJulianDate(results, jdRefined);
     }
   }
 

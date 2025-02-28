@@ -3,10 +3,10 @@
  * @description Geopotential and geoid calculations using WGS84/EGM2008 models
  */
 
-import { GEODETIC } from "../constraints/earth";
-import { GeoidModel } from "../constraints/refinements";
-import type { Degrees, Meters, Radians } from "../constraints/types";
-import { degreesToRadians } from "./trigonometry";
+import { GEODETIC } from "../../constraints/constants/earth";
+import { GeoidModel } from "../../constraints/refinements";
+import type { Degrees, Meters, Radians } from "../../constraints/types";
+import { degreesToRadians } from "../trigonometry/trigonometry";
 
 /**
  * Low-degree spherical harmonic coefficients approximating EGM2008 geoid patterns.

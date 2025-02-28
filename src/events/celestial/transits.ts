@@ -21,22 +21,23 @@
  * @see {@link utils.refineEvent} Root-finding implementation
  */
 
-import { SIDEREAL } from "./constraints/earth";
-import { FULL_CIRCLE_DEGREES, PI, TAU } from "./constraints/math";
+import { SIDEREAL } from "../../constraints/constants/earth";
 import {
   DAYS_PER_JULIAN_CENTURY,
   HALF_DAY,
   JULIAN_EPOCH_J2000,
-} from "./constraints/time";
+} from "../../constraints/constants/time";
+import { FULL_CIRCLE_DEGREES, PI, TAU } from "../../constraints/math";
 import {
   Degrees,
   JulianCenturyUT1,
   JulianDayTT,
   JulianDayUT1,
   Radians,
-} from "./constraints/types";
-import { ttToUT1 } from "./utilities/terrestrialtime";
-import { CelestialCoordinates, degreesToRadians, refineEvent } from "./utils";
+} from "../../constraints/types";
+import { degreesToRadians } from "../../math/trigonometry/trigonometry";
+import { ttToUT1 } from "../../time/scale/terrestrialtime";
+import { CelestialCoordinates } from "./position";
 
 // Update PreciseTransitData to use branded types
 export type PreciseTransitData = {

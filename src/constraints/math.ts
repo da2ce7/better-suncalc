@@ -28,10 +28,10 @@ export const TAU = 2 * PI; // Unitless
 export const FULL_CIRCLE_DEGREES: Degrees = 360 as Degrees;
 
 /**
- * Conversion factor from AU to KM.
+ * Conversion factor from AstronomicalUnits to KM.
  * @constant {number}
  * @unit unitless
- * @example 1 AU to kilometers
+ * @example 1 AstronomicalUnits to kilometers
  */
 export const AU_TO_KM = 149597870.7;
 

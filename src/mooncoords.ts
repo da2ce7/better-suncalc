@@ -4,28 +4,28 @@
  * Provides approximate positions valid for a certain period around J2000.
  */
 
-import { LUNAR } from "./constraints/lunar";
+import { LUNAR } from "./constraints/constants/lunar";
 import {
-  AU,
+  AstronomicalUnits,
   J2000CenturyTT,
   J2000DayTT,
   JulianDayTT,
   Radians,
 } from "./constraints/types";
+import { eclipticToDeclination } from "./ephemerides/celestial/equatorial";
+import {
+  calculateTrueObliquity,
+  CelestialCoordinates,
+} from "./events/celestial/position";
 import {
   angularDisplacementAstro,
   eclipticLatitudeFromInclination,
   eclipticLongitudeWithEvection,
   ellipticalDistance,
   getJulianCenturiesSinceJ2000,
-  julianDayToJ2000Day,
-} from "./utilities/austomath";
-import {
-  calculateTrueObliquity,
-  CelestialCoordinates,
-  getDeclination,
   getRightAscension,
-} from "./utils";
+  julianDayToJ2000Day,
+} from "./math/austomath";
 
 /* ==================== Coordinate Calculations ==================== */
 
@@ -35,7 +35,7 @@ import {
  * - Distance is approximated using the mean anomaly and orbital eccentricity.
  * @param {JulianDayTT} time - Julian day in Terrestrial Time (TT).
  * @returns {CelestialCoordinates} Object containing right ascension (ra), declination (dec),
- * distance in AU, ecliptic longitude (eclipticLon), and ecliptic latitude (eclipticLat), all in radians.
+ * distance in AstronomicalUnits, ecliptic longitude (eclipticLon), and ecliptic latitude (eclipticLat), all in radians.
  */
 export function calculateLunarCoordinates(
   time: JulianDayTT,
@@ -78,7 +78,7 @@ export function calculateLunarCoordinates(
     meanArgLatitude,
   );
 
-  const distance: AU = ellipticalDistance(
+  const distance: AstronomicalUnits = ellipticalDistance(
     LUNAR.ORBIT.SEMI_MAJOR_AXIS,
     LUNAR.ORBIT.ECCENTRICITY,
     meanAnomaly,
@@ -93,7 +93,7 @@ export function calculateLunarCoordinates(
     eclipticLatitude,
     epsilon,
   );
-  const declination: Radians = getDeclination(
+  const declination: Radians = eclipticToDeclination(
     eclipticLongitude,
     eclipticLatitude,
     epsilon,

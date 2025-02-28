@@ -5,9 +5,9 @@
 
 import { TopocentricEventConfig } from "../constraints/refinements";
 import { Days, Meters, Radians } from "../constraints/types";
-import { refineRoot } from "../utilities/findroot";
-import { adjustElevationForGeoid } from "../utilities/geopotential";
-import { applyRefraction } from "../utilities/refraction";
+import { applyRefraction } from "../ephemerides/terrestrial/refraction";
+import { adjustElevationForGeoid } from "../math/geodesy/geopotential";
+import { refineRoot } from "../math/root-finders/newton-raphson";
 
 export function refineTopocentricEvent(
   initialEstimate: Days,

@@ -5,8 +5,8 @@
 
 import { CelestialEventTimingConfig } from "../constraints/refinements";
 import { Days, J2000CenturyTT, J2000DayTT } from "../constraints/types";
-import { toCenturyTT } from "../utilities/austomath";
-import { refineRoot } from "../utilities/findroot";
+import { toCenturyTT } from "../math/austomath";
+import { refineRoot } from "../math/root-finders/newton-raphson";
 
 export function refineCelestialEventTiming(
   initialEstimate: J2000DayTT,

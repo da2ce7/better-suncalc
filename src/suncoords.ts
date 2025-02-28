@@ -4,28 +4,30 @@
  * Valid for ±200 years around J2000 (~1800-2200), ~0.01° accuracy in declination.
  */
 
-import { EARTH } from "./constraints/earth";
-import { SOLAR } from "./constraints/solar";
+import { EARTH } from "./constraints/constants/earth";
 import {
   DAYS_PER_JULIAN_CENTURY,
   JULIAN_EPOCH_J2000,
-} from "./constraints/time";
+} from "./constraints/constants/time";
+import { SOLAR } from "./constraints/solar";
 import {
-  AU,
+  AstronomicalUnits,
   Days,
   Degrees,
   J2000CenturyTT,
   JulianDayTT,
   Radians,
 } from "./constraints/types";
+import { eclipticToDeclination } from "./ephemerides/celestial/equatorial";
 import {
   calculateTrueObliquity,
   CelestialCoordinates,
-  degreesToRadians,
-  getDeclination,
+} from "./events/celestial/position";
+import {
   getJulianCenturiesSinceJ2000,
   getRightAscension,
-} from "./utils";
+} from "./math/austomath";
+import { degreesToRadians } from "./math/trigonometry/trigonometry";
 
 /* ==================== Coordinate Calculations ==================== */
 
@@ -33,10 +35,10 @@ import {
  * Calculates the sun's celestial coordinates and distance for a given Julian day in Terrestrial Time (TT).
  * - Valid for ±200 years around J2000 (~1800-2200)
  * - ~0.01° accuracy in declination
- * - Distance approximated with r ≈ 1 - e * cos(M) in AU
+ * - Distance approximated with r ≈ 1 - e * cos(M) in AstronomicalUnits
  * @param {JulianDayTT} jd_tt - Julian day in Terrestrial Time (TT).
  * @returns {CelestialCoordinates} Object containing right ascension (ra), declination (dec),
- * ecliptic longitude (eclipticLon), ecliptic latitude (eclipticLat) in radians, and distance in AU.
+ * ecliptic longitude (eclipticLon), ecliptic latitude (eclipticLat) in radians, and distance in AstronomicalUnits.
  */
 export function calculateSolarCoordinates(
   jd_tt: JulianDayTT,
@@ -50,12 +52,13 @@ export function calculateSolarCoordinates(
     0 as Radians,
     epsilon_rad,
   );
-  const declination: Radians = getDeclination(
+  const declination: Radians = eclipticToDeclination(
     eclipticLon_rad,
     0 as Radians,
     epsilon_rad,
   );
-  const distance: AU = (1 - EARTH.ORBIT.ECCENTRICITY * Math.cos(M_rad)) as AU; // Distance in AU
+  const distance: AstronomicalUnits = (1 -
+    EARTH.ORBIT.ECCENTRICITY * Math.cos(M_rad)) as AstronomicalUnits; // Distance in AstronomicalUnits
 
   return {
     rightAscension: rightAscension,

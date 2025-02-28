@@ -3,19 +3,19 @@
  * @description Time Related To Earth
  */
 
-import { DELTA_T_POLYNOMIAL_SEGMENTS } from "../constraints/earth";
+import { DELTA_T_POLYNOMIAL_SEGMENTS } from "../../constraints/constants/earth";
 import {
   HALF_DAY,
   JULIAN_CONVERSION,
   JULIAN_EPOCH_J1970,
   TIME_UNITS,
-} from "../constraints/time";
+} from "../../constraints/constants/time";
 import {
   JulianDayTT,
   JulianDayUT1,
   Milliseconds,
   Seconds,
-} from "../constraints/types";
+} from "../../constraints/types";
 
 /**
  * Converts a UTC Date to a Terrestrial Time (TT) Julian Date.

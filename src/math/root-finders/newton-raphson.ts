@@ -3,7 +3,7 @@
  * @description Newton-Raphson root finding with astronomical refinement policies
  */
 
-import { RefinementConfig } from "../constraints/refinements";
+import { RefinementConfig } from "../../constraints/refinements";
 
 /**
  * Compute numerical derivative with safety checks

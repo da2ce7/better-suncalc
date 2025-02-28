@@ -5,16 +5,19 @@
  * All time-based inputs and outputs are in JD TT (Terrestrial Time) unless otherwise stated.
  */
 
+import { HALF_DAY } from "./constraints/constants/time";
 import {
   NUMERICAL,
   PI,
   SOLAR_EVENT_DEFINITIONS,
   TAU,
 } from "./constraints/math";
-import { HALF_DAY } from "./constraints/time";
 import { Days, Degrees, JulianDayTT, Radians } from "./constraints/types";
+import {
+  computeHourAngleAtRef,
+  getClosestTransitCycle,
+} from "./events/celestial/transits";
 import { calculateSolarCoordinates } from "./suncoords";
-import { computeHourAngleAtRef, getClosestTransitCycle } from "./transits";
 import {
   altitude,
   astroRefraction,

@@ -3,9 +3,13 @@
  * @description Atmospheric refraction models for precise topocentric calculations
  */
 
-import { RefractionModel } from "../constraints/refinements";
-import type { Degrees, Meters, Radians } from "../constraints/types";
-import { degreesToRadians, radiansToDegrees } from "./trigonometry";
+import { REFRACTION } from "../../constraints/constants/earth";
+import { RefractionModel } from "../../constraints/refinements";
+import type { Degrees, Meters, Radians } from "../../constraints/types";
+import {
+  degreesToRadians,
+  radiansToDegrees,
+} from "../../math/trigonometry/trigonometry";
 
 /**
  * Calculate apparent elevation due to atmospheric refraction
@@ -71,4 +75,31 @@ function radioRefraction(elevDeg: Degrees, wavelengthM: number): number {
     Math.pow(wavelengthM, -0.0003) *
     Math.pow(Math.cos(degreesToRadians(elevDeg)), 1.3)
   );
+}
+
+/**
+ * Applies Saemundsson's refraction model for altitude correction.
+ * @param {Radians} geometricAltitude - Geometric altitude in radians.
+ * @returns {Radians} Refraction adjustment in radians.
+ */
+export function applyStandardRefraction(geometricAltitude: Radians): Radians {
+  const minAltRad: Radians = degreesToRadians(
+    REFRACTION.SAEMUNDSSON.MIN_ALTITUDE,
+  );
+  const clampedAltitude: Radians = Math.max(
+    geometricAltitude,
+    minAltRad,
+  ) as Radians;
+  const clampedAltitudeDeg: Degrees = radiansToDegrees(clampedAltitude);
+  const altitudeAdjustmentDeg =
+    REFRACTION.SAEMUNDSSON.ALTITUDE_OFFSET /
+    (clampedAltitudeDeg + REFRACTION.SAEMUNDSSON.DENOMINATOR_OFFSET);
+  const adjustedAltitudeDeg: Degrees = (clampedAltitudeDeg +
+    altitudeAdjustmentDeg) as Degrees;
+  const tanTerm = Math.tan(degreesToRadians(adjustedAltitudeDeg));
+  return tanTerm !== 0
+    ? degreesToRadians(
+        (REFRACTION.SAEMUNDSSON.COEFFICIENT / tanTerm) as Degrees,
+      )
+    : (0 as Radians);
 }
