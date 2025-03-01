@@ -69,9 +69,28 @@ export type Parsecs = Brand<number, "Parsecs">;
 export type SolarRadii = Brand<number, "SolarRadii">;
 
 /**
- * Represents distance in Earth-Moon average orbital distances (384,399 km).
+ * Geocentric distance measured in Lunar Distance units (LD) - the average distance
+ * between Earth and Moon centers. Primary use case: Near-Earth object proximity analysis.
+ *
+ * @definition
+ * 1 LD ≡ 384,399,000 meters ≡ 384,399 km (DE440 reference)
+ *        ≈ 0.0025695 AU (Astronomical Units)
+ *
+ * @application
+ * - Asteroid close approach measurements
+ * - Lunar mission trajectory analysis
+ * - Tidal force calculations
+ *
  * @example
- * const asteroidApproach: LunarDistances = 0.85 as LunarDistances;
+ * // Apophis closest approach (2029-04-13)
+ * const apophisApproach = 0.112 as LunarDistances; // ~43,000 km
+ *
+ * // Chang'e 6 mission orbital insertion
+ * const insertionAltitude = 0.00026 as LunarDistances; // 100 km above surface
+ *
+ * @note
+ * Unlike Astronomical Units (heliocentric), Lunar Distance is geocentric. For
+ * selenocentric measurements, use `Meters` or `Kilometers` directly.
  */
 export type LunarDistances = Brand<number, "LunarDistances">;
 

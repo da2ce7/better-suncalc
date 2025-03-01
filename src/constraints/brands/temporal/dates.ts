@@ -17,7 +17,7 @@
  * @see {@link https://en.wikipedia.org/wiki/Julian_day|Julian Date}
  */
 
-import { Brand } from "../types";
+import { Brand } from "../../types";
 
 /**
  * Days in Terrestrial Time (TT) since J2000 epoch (January 1, 2000 12:00 TT)

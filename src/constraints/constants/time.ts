@@ -4,11 +4,13 @@
  */
 
 import {
-  Hours,
-  JulianDateTT,
-  Milliseconds,
-  Seconds,
-  TerrestrialDays,
+  HoursDuration,
+  JulianDaysDuration,
+  MillisecondsDuration,
+  SecondsDuration,
+  SecondsPerAstronomicalUnit,
+  TerrestrialCenturiesSinceJ2000,
+  TerrestrialDaysSinceJulianEpoch,
 } from "../brands";
 
 /** ====================== Time Definitions and Epochs ====================== */
@@ -20,84 +22,90 @@ import {
 export const JULIAN_CONVERSION = {
   /**
    * Maximum iterations for UTC to Julian date conversion.
-   * @constant {number}
    * @unitless
-   * @description ΔT convergence typically requires ≤3 iterations in practice.
    */
   MAX_ITERATIONS: 5,
 };
 
 /**
- * Number of terrestrial days in a Julian century (IAU definition).
- * @constant {TerrestrialDays}
- * @unit terrestrial days
- * @see {@link https://www.iau.org/publications/proceedings_rules/units/|IAU Unit Standards}
+ * Exact duration of a Julian century in fundamental SI seconds.
+ * 100 Julian years = 31,557,600 × 100 seconds.
+ * @constant {JulianCentury}
+ * @see IAU Resolution B1 2000
  */
-export const DAYS_PER_JULIAN_CENTURY: TerrestrialDays =
-  36525 as TerrestrialDays;
+export const SECONDS_PER_JULIAN_CENTURY: SecondsDuration =
+  3_155_760_000 as SecondsDuration;
 
 /**
- * Half an Earth solar day (local apparent time basis).
- * @constant {TerrestrialDays}
- * @unit terrestrial days
+ * Half of Earth's fundamental rotation period (12 hours) in atomic TDB seconds.
+ * @constant {SecondsDuration}
  */
-export const HALF_DAY: TerrestrialDays = 0.5 as TerrestrialDays;
+export const HALF_SIDEREAL_DAY: SecondsDuration = 43_082 as SecondsDuration;
 
 /**
- * Julian Date for J1970 epoch (January 1, 1970 00:00:00 UTC).
- * @constant {JulianDateTT}
- * @unit Julian Date (TT scale)
+ * Epoch anchoring constants in JPL Solar System barycentric time (TDB)
  */
-export const JULIAN_EPOCH_J1970: JulianDateTT = 2440588.0 as JulianDateTT;
+export const TDB_EPOCHS = {
+  /**
+   * Unix epoch (1970-01-01T00:00:00 TDB) in Julian days.
+   * @constant {TerrestrialDaysSinceJulianEpoch}
+   */
+  UNIX: 2440587.5 as TerrestrialDaysSinceJulianEpoch,
+
+  /**
+   * J2000 epoch (2000-01-01T12:00:00 TDB) in Julian days.
+   * @constant {TerrestrialDaysSinceJulianEpoch}
+   */
+  J2000: 2451545.0 as TerrestrialDaysSinceJulianEpoch,
+};
+
+/** ====================== Unit Conversion Factors ====================== */
 
 /**
- * Julian Date for J2000 epoch (January 1, 2000 12:00:00 TT).
- * @constant {JulianDateTT}
- * @unit Julian Date (TT scale)
- * @see {@link https://science.nasa.gov/astrophysics/focus-areas/time/|NASA Timekeeping}
- */
-export const JULIAN_EPOCH_J2000: JulianDateTT = 2451545.0 as JulianDateTT;
-
-/**
- * Comprehensive time unit conversions.
+ * Fundamental time unit relationships according to
+ * International System of Quantities (ISQ) standards.
  * @constant {Object}
  */
 export const TIME_UNITS = {
-  /** Relative time scaling factors */
-  DYNAMIC_SCALES: {
-    /**
-     * Light-travel time conversion (terrestrial seconds ~ absolute distance).
-     * @constant {Number}
-     * @unit seconds · METERS_PER_AU⁻¹
-     */
-    SPACETIME_FACTOR: 499.004783806 as number,
+  /** Light-travel time constants (vacuum) */
+  RELATIVITY: {
+    /** Seconds per astronomical unit (AU/c) */
+    SECOND_PER_AU: 499.004_783_806 as SecondsPerAstronomicalUnit,
   },
 
-  /** Millisecond-based durations */
-  MILLISECONDS: {
-    /** @constant {Milliseconds} Terrestrial hour duration */
-    HOUR: 3_600_000 as Milliseconds,
-    /** @constant {Milliseconds} Terrestrial day duration */
-    DAY: 86_400_000 as Milliseconds,
+  /** SI unit relationships */
+  SI_DERIVATIVES: {
+    /** @constant {MillisecondsDuration} Terrestrial hour duration */
+    HOUR_IN_MILLISECONDS: 3_600_000 as MillisecondsDuration,
+    /** @constant {SecondsDuration} Terrestrial day duration */
+    DAY_IN_SECONDS: 86_400 as SecondsDuration,
+    /** @constant {Hours} Days→hours conversion factor */
+    DAY_IN_HOURS: 24 as HoursDuration,
   },
 
-  /** Second-based durations */
-  SECONDS: {
-    /** @constant {Seconds} Terrestrial hour duration */
-    HOUR: 3600 as Seconds,
-    /** @constant {Seconds} Terrestrial day duration */
-    DAY: 86400 as Seconds,
-  },
-
-  /** Hour-based durations */
-  HOURS: {
-    /** @constant {Hours} Terrestrial day duration */
-    DAY: 24 as Hours,
-  },
-
-  /** Day-based durations */
-  DAYS: {
-    /** @constant {TerrestrialDays} Julian century duration (definition) */
-    CENTURY: 36525 as TerrestrialDays,
+  /** Julian unit relationships */
+  JULIAN: {
+    /** @constant {JulianDaysDuration} Days per Julian year (fixed) */
+    DAYS_PER_YEAR: 365.25 as JulianDaysDuration,
+    /** @constant {JulianDaysDuration} Fundamental unit of ephemeris datekeeping */
+    DAYS_PER_CENTURY: 36_525 as JulianDaysDuration,
   },
 };
+
+/** ====================== Time Scale Offsets ====================== */
+
+/**
+ * ΔT (Terrestrial Time - Universal Time) polynomial fitting segments.
+ * Modern intervals use weighted least-squares fits based on IERS data.
+ * @constant {Array<[t: TerrestrialCenturiesSinceJ2000, coefficients: number[]]>}
+ */
+export const DELTA_T_POLYNOMIALS = [
+  [
+    -5.0 as TerrestrialCenturiesSinceJ2000,
+    [1623.2, -247.53, 27.98], // 1800-1893 quadratic fit
+  ],
+  [
+    0.0 as TerrestrialCenturiesSinceJ2000,
+    [64.3, 95.8, 31.5, 2.8], // 1990-2024 cubic term
+  ],
+];

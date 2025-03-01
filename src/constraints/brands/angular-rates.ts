@@ -60,6 +60,21 @@ export type DegreesPerJulianCenturySquared = Brand<
   "DegreesPerJulianCenturySquared"
 >;
 
+/**
+ * Represents third-order angular acceleration in cubic Julian century timebase.
+ * Used for modeling higher-order terms in long-term astronomical precession
+ * and nutation theories.
+ *
+ * @unit deg/cty³
+ * @example
+ * const iau2006CubicTerm: DegreesPerJulianCenturyCubed = 0.000000742 as DegreesPerJulianCenturyCubed; // IAU 2006 precession model T³ component
+ * @see {@link https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html} (IAU 2006 Precession)
+ */
+export type DegreesPerJulianCenturyCubed = Brand<
+  number,
+  "DegreesPerJulianCenturyCubed"
+>;
+
 // =========== High Precision Astrometry =========== //
 
 /**

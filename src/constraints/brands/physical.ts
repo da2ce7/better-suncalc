@@ -118,13 +118,6 @@ export type Tesla = Brand<number, "Tesla">;
  */
 export type ElectronsPerCubicMeter = Brand<number, "ElectronsPerCubicMeter">;
 
-/**
- * Represents plasma beta (ratio of thermal to magnetic pressure).
- * @example
- * const coronalLoopsBeta: PlasmaBeta = 0.01 as PlasmaBeta;
- */
-export type PlasmaBeta = Brand<number, "PlasmaBeta">;
-
 //  === Quantum & Relativity ===
 
 /**
@@ -172,20 +165,6 @@ export type ElementalChargeFlux = Brand<number, "ElementalChargeFlux">;
 export type kWh = Brand<number, "kWh">;
 
 //  === Composition Metrics ===
-
-/**
- * Represents metallicity relative to solar ([Fe/H] ≤ 0).
- * @example
- * const haloStarMetal: Metallicity = -2.5 as Metallicity;
- */
-export type Metallicity = Brand<number, "Metallicity">;
-
-/**
- * Represents water-ice fraction by mass.
- * @example
- * const enceladusOcean: IceMassFraction = 0.8 as IceMassFraction;
- */
-export type IceMassFraction = Brand<number, "IceMassFraction">;
 
 /**
  * Represents solar irradiance (Watts per square meter).

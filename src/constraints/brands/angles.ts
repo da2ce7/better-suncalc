@@ -42,6 +42,60 @@ export type Arcminutes = Brand<number, "Arcminutes">;
 export type Arcseconds = Brand<number, "Arcseconds">;
 
 /**
+ * Represents an angle in degrees relative to the ecliptic coordinate system
+ * (Earth's orbital plane around the Sun).
+ * @example
+ * const eclipticLatitude: Degrees_Ecliptic = 23.4 as Degrees_Ecliptic;
+ */
+export type Degrees_Ecliptic = Brand<number, "Degrees_Ecliptic">;
+
+/**
+ * Represents an angle in degrees relative to the equatorial coordinate system
+ * (projection of Earth's equator and rotation axis onto the celestial sphere).
+ * @example
+ * const rightAscension: Degrees_Equatorial = 12.34 as Degrees_Equatorial;
+ */
+export type Degrees_Equatorial = Brand<number, "Degrees_Equatorial">;
+
+/**
+ * Represents an angle in degrees relative to the galactic coordinate system
+ * (Milky Way galaxy's fundamental plane centered on the Sun).
+ * @example
+ * const galacticLongitude: Degrees_Galactic = 142.6 as Degrees_Galactic;
+ */
+export type Degrees_Galactic = Brand<number, "Degrees_Galactic">;
+
+/**
+ * Represents an angle in degrees relative to the horizontal coordinate system
+ * (observer's local horizon for altitude/azimuth measurements).
+ * @example
+ * const horizonAltitude: Degrees_Horizontal = 45.0 as Degrees_Horizontal;
+ */
+export type Degrees_Horizontal = Brand<number, "Degrees_Horizontal">;
+
+/**
+ * Represents an elevation angle above the horizon in degrees.
+ * @example
+ * const altitude: Degrees_Altitude = 45 as Degrees_Altitude; // (Math.PI/4) above horizon
+ */
+export type Degrees_Altitude = Brand<number, "Degrees_Altitude">;
+
+/**
+ * Represents an azimuth angle (compass direction) in degrees.
+ * @example
+ * const azimuth: Degrees_Azimuth = 90 as Degrees_Azimuth; // Math.PI/2 (East)
+ */
+export type Degrees_Azimuth = Brand<number, "Degrees_Azimuth">;
+
+/**
+ * Represents a parallactic angle in degrees (angle between celestial object's
+ * hour circle and vertical circle).
+ * @example
+ * const parallacticAngle: Degrees_Parallactic = 22.5 as Degrees_Parallactic;
+ */
+export type Degrees_Parallactic = Brand<number, "Degrees_Parallactic">;
+
+/**
  * Represents an angle in radians relative to the ecliptic coordinate system
  * (Earth's orbital plane around the Sun).
  * @example
@@ -76,21 +130,21 @@ export type Radians_Horizontal = Brand<number, "Radians_Horizontal">;
 /**
  * Represents an elevation angle above the horizon in radians.
  * @example
- * const altitude: Altitude = (Math.PI/4) as Altitude; // 45 degrees above horizon
+ * const altitude: Radians_Altitude = (Math.PI/4) as Radians_Altitude; // 45 degrees above horizon
  */
-export type Altitude = Brand<number, "Altitude">;
+export type Radians_Altitude = Brand<number, "Radians_Altitude">;
 
 /**
  * Represents an azimuth angle (compass direction) in radians.
  * @example
- * const azimuth: Azimuth = (Math.PI/2) as Azimuth; // 90° (East)
+ * const azimuth: Radians_Azimuth = (Math.PI/2) as Radians_Azimuth; // 90° (East)
  */
-export type Azimuth = Brand<number, "Azimuth">;
+export type Radians_Azimuth = Brand<number, "Radians_Azimuth">;
 
 /**
  * Represents a parallactic angle in radians (angle between celestial object's
  * hour circle and vertical circle).
  * @example
- * const parallacticAngle: ParallacticAngle = 0.45 as ParallacticAngle;
+ * const parallacticAngle: Radians_Parallactic = (Math.PI/8) as Radians_Parallactic;
  */
-export type ParallacticAngle = Brand<number, "ParallacticAngle">;
+export type Radians_Parallactic = Brand<number, "Radians_Parallactic">;

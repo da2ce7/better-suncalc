@@ -3,8 +3,8 @@
  * @description Equatorial coordinate system transformations
  */
 
+import { Radians_Ecliptic, Radians_Equatorial } from "../../constraints/brands";
 import { TAU } from "../../constraints/math";
-import { Radians_Ecliptic, Radians_Equatorial } from "../../constraints/types";
 
 /**
  * Converts ecliptic coordinates to right ascension

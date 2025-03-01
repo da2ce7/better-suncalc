@@ -3,9 +3,9 @@
  * @description Atmospheric refraction models for precise topocentric calculations
  */
 
+import { Degrees, Meters, Radians } from "../../constraints/brands";
 import { REFRACTION } from "../../constraints/constants/earth";
 import { RefractionModel } from "../../constraints/refinements";
-import type { Degrees, Meters, Radians } from "../../constraints/types";
 import {
   degreesToRadians,
   radiansToDegrees,
@@ -77,29 +77,29 @@ function radioRefraction(elevDeg: Degrees, wavelengthM: number): number {
   );
 }
 
-/**
- * Applies Saemundsson's refraction model for altitude correction.
- * @param {Radians} geometricAltitude - Geometric altitude in radians.
- * @returns {Radians} Refraction adjustment in radians.
- */
+// utilities/refraction.ts
 export function applyStandardRefraction(geometricAltitude: Radians): Radians {
-  const minAltRad: Radians = degreesToRadians(
-    REFRACTION.SAEMUNDSSON.MIN_ALTITUDE,
-  );
+  const { SAEMUNDSSON } = REFRACTION;
+  const minAltRad = degreesToRadians(SAEMUNDSSON.MIN_ALTITUDE);
   const clampedAltitude: Radians = Math.max(
     geometricAltitude,
     minAltRad,
   ) as Radians;
-  const clampedAltitudeDeg: Degrees = radiansToDegrees(clampedAltitude);
+  const clampedAltitudeDeg = radiansToDegrees(clampedAltitude);
+
+  // Compute adjusted geometric altitude
   const altitudeAdjustmentDeg =
-    REFRACTION.SAEMUNDSSON.ALTITUDE_OFFSET /
-    (clampedAltitudeDeg + REFRACTION.SAEMUNDSSON.DENOMINATOR_OFFSET);
-  const adjustedAltitudeDeg: Degrees = (clampedAltitudeDeg +
-    altitudeAdjustmentDeg) as Degrees;
-  const tanTerm = Math.tan(degreesToRadians(adjustedAltitudeDeg));
-  return tanTerm !== 0
-    ? degreesToRadians(
-        (REFRACTION.SAEMUNDSSON.COEFFICIENT / tanTerm) as Degrees,
-      )
-    : (0 as Radians);
+    SAEMUNDSSON.ALTITUDE_OFFSET /
+    (clampedAltitudeDeg + SAEMUNDSSON.DENOMINATOR_OFFSET);
+  const adjustedAltitudeDeg = clampedAltitudeDeg + altitudeAdjustmentDeg;
+  const adjustedAltitudeRad = degreesToRadians(adjustedAltitudeDeg as Degrees);
+
+  // Avoid division by zero at tangent = 0
+  const tanTerm = Math.tan(adjustedAltitudeRad);
+  if (tanTerm === 0) return 0 as Radians;
+
+  // Calculate refraction in arcminutes, then convert to degrees and radians
+  const refractionArcMin = SAEMUNDSSON.COEFFICIENT_ARCMIN / tanTerm;
+  const refractionDeg = refractionArcMin / 60; // Convert arcminutes to degrees
+  return degreesToRadians(refractionDeg as Degrees);
 }

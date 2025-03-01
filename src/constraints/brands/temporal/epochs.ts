@@ -1,5 +1,5 @@
 /**
- * @file constraints/brands/epochs.ts
+ * @file constraints/brands/temporal/epochs.ts
  * @module epochs
  * @description Branded types for astronomical epoch specifications.
  *
@@ -8,7 +8,7 @@
  * - Fixed chronological definitions (Julian = fixed TT timestamp)
  */
 
-import { Brand } from "../types";
+import { Brand } from "../../types";
 
 /**
  * Represents a Besselian epoch as a fractional Besselian tropical year

@@ -1,75 +1,337 @@
 /**
  * @file constraints/brands/index.ts
- * @module brands
- * @description Type-safe astronomical units through branded types.
  *
- * ## Naming Convention Standards
+ * @naming_schema Type Naming Convention Specification
  *
- * 1. **Capitalization**: Pascal for for multi-word brands
- * 2. **Suffix Notation**:
- *    - `_TT` = Terrestrial Time
- *    - `_UT1` = Universal Time 1
- *    - `_UTC` = Coordinated Universal Time
- * 3. **Abbreviations**:
- *    - `AstronomicalUnits` = Astronomical Unit
- *    - `JD` = Julian Date
- *    - `MJD` = Modified Julian Date
- * 4. **Compound Units**:
- *    - `Per` separator: `DegreesPerHour`
- *    - `_` for multi-slash: `ElectronsPerCubicMeter`
- * 5. **Special Cases**:
- *    - `RedshiftZ` (dimensionless)
- *    - `PlasmaBeta` (unitless ratio)
+ * ## Naming Schema Architecture
  *
- * ## Complete Brand Catalog (155 types)
+ * 1. **Core Pattern**
+ *    `[Quantity][Unit]_[Context]_[TimeScale|Frame]`
  *
- * ### Angular Systems (27 types)
- * - Angles: Degrees, Radians, Arcminutes, Arcseconds, Radians_Ecliptic, Radians_Equatorial,
- *   Radians_Galactic, Radians_Horizontal, Altitude, Azimuth, ParallacticAngle
- * - Rates: DegreesPerSecond, DegreesPerHour, DegreesPerJulianYear, DegreesPerJulianCentury,
- *   ArcsecondsPerYear, MilliarcsecondsPerYear, MicroarcsecondsPerYear, RadiansPerTTSecond, RevolutionsPerMinute,
- *   DegreesPerSecondSquared, RadiansPerSiderealDay, EclipticLongitudeRate,
- *   ArcsecondsPerOrbit, DegreesPerDay, DegreesPerDayTT, DegreesPerSiderealDay
-
- * ### Temporal Metrics (46 types)
- * - Epochs: J2000DateTT,J2000DateUT1,JulianDateTT,JulianDateUT1,ModifiedJulianDateUTC,UnixEpochSecondsUTC,
- *   UnixEpochMillisecondsUTC,BesselianEpoch,JulianEpoch,GPSTimeSeconds,TAISeconds,J2000CenturyDateTT
- * - Intervals: Milliseconds,Seconds,Minutes,Hours,TerrestrialDays,SiderealDays,JulianYear,
- *   JulianCentury,TT_Seconds,TAI_Seconds,TDB_Seconds,LightTravelTimeSeconds,GPS_Seconds,AUPerSecond,
- *   MillisecondsPerJulianCentury
- * - Rates: SolarMassesPerYear,KilometersPerSecond,FractionOfC,SecondsPerOrbit,R_sPerSecond,KilogramsPerSecond,
- *   DM_AnnihilationRate,MagnitudeDeclinePerMinute,SFRDensity,MetallicityRate,HubbleFlowRate,
- *   keVPerSecond,NeutrinoFluxRate,CosmicRayFlux,AtmospheresLossRate
-
- * ### Spatial Metrics (13 types)
- * - Distances: Meters,Kilometers,AstronomicalUnits,LightSeconds,LightYears,Parsecs,
- *   SolarRadii,LunarDistances,HubbleLengths,Kiloparsecs,RedshiftZ,GravitationalRadii,WavelengthMeters
-
- * ### Fundamental Physics (23 types)
- * - Mass/Energy: Kilograms,SolarMass,EarthMasses,JupiterMasses,Joules,Ergs,kWh
- * - Radiometry: SolarLuminosity, SolarIrradiance
- * - Thermodynamics: Kelvin,keV_Temperature,Hectopascal
- * - Dynamics: MetersPerSecondSquared, GCRS_Gravity
- * - E&M: Tesla,Coulombs,ElementalChargeFlux
- * - Others: Janskys,ElectronsPerCubicMeter,PlasmaBeta,Strain,Metallicity,IceMassFraction,RedshiftVelocity
-
- * ### Misc Physics (2 types)
- * - Volumetric Rates: MetersCubedPerSecondSquared
- * - Perspective Scaling: ParsecsPerKilometer
-
- * @example
- * // Import individual categories
- * import { Degrees, SolarMass } from './brands';
+ *    - Ordered by specificity: Base unit → Spatial context → Temporal context
+ *    - Underscore-delimited segments for machine readability
  *
- * // Import all brands (Tree-shaking recommended)
- * import * as AstroUnits from './brands';
+ * 2. **Component Definitions**
+ *    - **Quantity/Unit**: Primary measurement (Degrees, Parsecs, Kelvin)
+ *    - **Context**:
+ *      - Spatial: Reference frame (Equatorial, Galactic, ICRF)
+ *      - Instrumentation: Observation context (Observed, FocalPlane)
+ *      - Physical: State context (CMB, ZeroAgeMainSequence)
+ *    - **TimeScale**: Chronological binding (TT, TAI, B1950, J2000)
+ *
+ * 3. **Chronological Significance**
+ *    - Time scales always suffix: `_TT`, `_TAI`, `_UTC`
+ *    - Epoch formats:
+ *      - Modern epochs: `_J2000`, `_B1950`
+ *      - Custom epochs: `_Epoch2023`
+ *
+ * 4. **Spatial Context Rules**
+ *    - Reference frames: `_ICRF`, `_Galactic`, `_Horizontal`
+ *    - Coordinate types: `_Geocentric`, `_Topocentric`
+ *
+ * 5. **Measurement Specificity**
+ *    - Precision markers: `_Mean`, `_Observed`, `_Theoretical`
+ *    - Evolutionary stages: `_PreMainSequence`, `_PostAGB`
+ *
+ * 6. **Compound Units**
+ *    - Rate denominators: `PerYear`, `PerSecondSquared`
+ *    - Ratios: `PerParsecCubed`, `PerElectronVolt`
+ *
+ * ## Standard Patterns
+ *
+ * ```typescript
+ * // Angular Measurements
+ * type Degrees_Equatorial_J2000 = number & { _frame: 'Equatorial J2000' };
+ *
+ * // Temporal Quantities
+ * type SecondsDuration_TT = number & { _timescale: 'Terrestrial Time' };
+ *
+ * // Coordinate-bound Distances
+ * type Parsecs_ICRF = number & { _frame: 'International Celestial Reference Frame' };
+ *
+ * // Contextual Physical Values
+ * type Kelvin_CMB = number & { _context: 'Cosmic Microwave Background' };
+ *
+ * // Epoch-bound Rates
+ * type ArcsecondsPerYear_B1950 = number & { _epoch: 'Besselian 1950' };
+ * ```
+ *
+ * ## Migration Strategy
+ *
+ * 1. **Legacy → New Format**
+ *    - `TT_SecondsDuration` → `SecondsDuration_TT`
+ *    - `DegreesPerDayTT` → `DegreesPerDay_TT`
+ *    - `GCRS_Gravity` → `MetersPerSecondSquared_GCRS`
+ *
+ * 2. **Context Promotion**
+ *    - Move instrumentation context from prefix to suffix:
+ *      `FocalPlaneCoordinates` → `Coordinates_FocalPlane`
+ *
+ * ## Validation Rules
+ * 1. No standalone unit types without context/time binding
+ * 2. Compound units must explicitly declare time denominators
+ * 3. Epoch declarations require year specification (J2000, B1950)
+ *
+ * @rationale Enhances type discovery through predictable patterns while maintaining
+ * backward-compatible astronomical semantics. Enables static analysis of dimensional
+ * compatibility through structured naming.
+ *
+ * @tooling_benefit Enables:
+ * - Grep-based type searches (`*_TT`)
+ * - IDE auto-completion hierarchies
+ * - Automated compatibility checking
+ *
+ * @see {@link https://www.iau.org/public/themes/measuring/ | IAU Measurement Standards}
  */
 
-// Core exports maintain original file structure
-export * from "./angles";
-export * from "./angular-rates";
-export * from "./dates";
-export * from "./distances";
-export * from "./other-rates";
-export * from "./physical";
-export * from "./temporal";
+export type FrameBrand<T, U extends string> = T & {
+  readonly _frame: U;
+  /** @deprecated Use _frame for new types */
+  readonly __brand?: never;
+};
+
+// Temporal Scale Branding
+export type TimescaleBrand<T, U extends string> = T & {
+  readonly _timescale: U;
+  /** @deprecated Use _timescale for new types */
+  readonly __brand?: never;
+};
+
+// Epoch Branding
+export type EpochBrand<T, U extends string> = T & {
+  readonly _epoch: U;
+  /** @deprecated Use _epoch for new types */
+  readonly __brand?: never;
+};
+
+// Physical Context Branding
+export type ContextBrand<T, U extends string> = T & {
+  readonly _context: U;
+  /** @deprecated Use _context for new types */
+  readonly __brand?: never;
+};
+
+// Rate Type Branding
+export type RateBrand<T, U extends string> = T & {
+  readonly _rate: U;
+  /** @deprecated Use _rate for new types */
+  readonly __brand?: never;
+};
+
+// enable dynamic updating of expanded exports using the `tools/expand-exports.ts` script.
+const expand_exports: string[] = [
+  "./angles",
+  "./angular-rates",
+  "./coordinates",
+  "./dimensionless",
+  "./distances",
+  "./dynamics/environmental",
+  "./dynamics/fluxes",
+  "./dynamics/mass-energy",
+  "./dynamics/specialized",
+  "./dynamics/velocity",
+  "./lunar",
+  "./physical",
+  "./relativity",
+  "./temporal/dates",
+  "./temporal/durations",
+  "./temporal/epochs",
+];
+
+/**
+ * Angular Measurements and Rates
+ * Types for angles and their rates of change, often tied to specific coordinate systems or time scales.
+ */
+export {
+  Arcminutes,
+  Arcseconds,
+  Degrees,
+  Degrees_Altitude,
+  Degrees_Azimuth,
+  Degrees_Ecliptic,
+  Degrees_Equatorial,
+  Degrees_Galactic,
+  Degrees_Horizontal,
+  Degrees_Parallactic,
+  Radians,
+  Radians_Altitude,
+  Radians_Azimuth,
+  Radians_Ecliptic,
+  Radians_Equatorial,
+  Radians_Galactic,
+  Radians_Horizontal,
+  Radians_Parallactic,
+} from "./angles";
+
+export {
+  ArcsecondsPerOrbit,
+  ArcsecondsPerYear,
+  DegreesPerDay,
+  DegreesPerDayTT,
+  DegreesPerHour,
+  DegreesPerJulianCentury,
+  DegreesPerJulianCenturyCubed,
+  DegreesPerJulianCenturySquared,
+  DegreesPerJulianYear,
+  DegreesPerSecond,
+  DegreesPerSecondSquared,
+  DegreesPerSiderealDay,
+  EclipticLongitudeRate,
+  MicroarcsecondsPerYear,
+  MilliarcsecondsPerYear,
+  RadiansPerSiderealDay,
+  RadiansPerTTSecond,
+  RevolutionsPerMinute,
+} from "./angular-rates";
+
+/**
+ * Coordinates and Reference Systems
+ * Types for positional data tied to specific reference frames or epochs.
+ */
+export {
+  Degrees_Ecliptic_J2000,
+  Degrees_Ecliptic_MeanOfDate,
+  Degrees_Galactic_IAU1958,
+  Degrees_GeocentricEquatorial,
+  Degrees_ICRF,
+  Degrees_ITRF,
+  Degrees_MeanEquator,
+  Degrees_ObservedHorizontal,
+  FocalPlaneCoordinates,
+} from "./coordinates";
+
+/**
+ * Time and Dates
+ * Types for representing dates, epochs, and durations with time scale specificity.
+ */
+export { BesselianEpoch, JulianEpoch } from "./temporal/epochs";
+
+export {
+  AtomicSecondsSinceTAIEpoch,
+  CoordinatedDaysSinceModifiedJulianEpoch,
+  CoordinatedMillisecondsSinceUnixEpoch,
+  CoordinatedSecondsSinceUnixEpoch,
+  GPSSecondsSinceGPSEpoch,
+  TerrestrialCenturiesSinceJ2000,
+  TerrestrialDaysSinceJ2000,
+  TerrestrialDaysSinceJulianEpoch,
+  UniversalDaysSinceJ2000,
+  UniversalDaysSinceJulianEpoch,
+} from "./temporal/dates";
+
+export {
+  GPS_SecondsDuration,
+  HoursDuration,
+  JulianCenturiesDuration,
+  JulianDaysDuration,
+  JulianYearsDuration,
+  MillisecondsDuration,
+  MinutesDuration,
+  SecondsDuration,
+  TAI_SecondsDuration,
+  TDB_SecondsDuration,
+  TT_SecondsDuration,
+} from "./temporal/durations";
+
+/**
+ * Distances and Scales
+ * Types for length measurements across various astronomical scales.
+ */
+export {
+  AstronomicalUnits,
+  GravitationalRadii,
+  HubbleLengths,
+  Kilometers,
+  Kiloparsecs,
+  LightSeconds,
+  LightTravelTimeSeconds,
+  LightYears,
+  LunarDistances,
+  Meters,
+  Parsecs,
+  RedshiftZ,
+  SolarRadii,
+  WavelengthMeters,
+} from "./distances";
+
+/**
+ * Physical Quantities
+ * Types for mass, energy, temperature, and other physical measurements.
+ */
+export {
+  Coulombs,
+  EarthMasses,
+  ElectronsPerCubicMeter,
+  ElementalChargeFlux,
+  Ergs,
+  GCRS_Gravity,
+  Hectopascal,
+  Janskys,
+  Joules,
+  JupiterMasses,
+  Kelvin,
+  keV_Temperature,
+  Kilograms,
+  kWh,
+  MetersPerSecondSquared,
+  RedshiftVelocity,
+  SolarIrradiance,
+  SolarLuminosity,
+  SolarMass,
+  Strain,
+  Tesla,
+} from "./physical";
+
+/**
+ * Relativity
+ * Types specific to relativistic effects and measurements.
+ */
+export { SecondsPerAstronomicalUnit, TimeDilationFactor } from "./relativity";
+
+/**
+ * Specialized Measurements
+ * Types for domain-specific measurements, such as lunar observations.
+ */
+export { LunarLibrationAmplitude, SelenographicLatitude } from "./lunar";
+
+/**
+ * Dimensionless Quantities
+ * Types for unitless ratios, fractions, and factors.
+ */
+export {
+  DimensionlessRatio,
+  GeometricAlbedo,
+  IceMassFraction,
+  Metallicity,
+  ParsecsPerKilometer,
+  PerJulianCentury,
+  PlasmaBeta,
+} from "./dimensionless";
+
+/**
+ * Dynamics and Rates
+ * Types for various rates and changes, including velocity, mass and energy, fluxes, environmental conditions, and specialized rates.
+ */
+export { PerDegreeCelsius, PerHectopascal } from "./dynamics/environmental";
+export { CosmicRayFlux, NeutrinoFluxRate, SFRDensity } from "./dynamics/fluxes";
+export {
+  keVPerSecond,
+  KilogramsPerSecond,
+  SolarMassesPerYear,
+} from "./dynamics/mass-energy";
+export {
+  AtmospheresLossRate,
+  DM_AnnihilationRate,
+  HubbleFlowRate,
+  MagnitudeDeclinePerMinute,
+  MetallicityRate,
+  MetersCubedPerSecondSquared,
+  MillisecondsPerJulianCentury,
+  SecondsPerOrbit,
+} from "./dynamics/specialized";
+export {
+  AUPerSecond,
+  FractionOfC,
+  KilometersPerSecond,
+  R_sPerSecond,
+} from "./dynamics/velocity";

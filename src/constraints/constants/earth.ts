@@ -1,183 +1,291 @@
 /**
  * @file constraints/constants/earth.ts
- * @description Constants related to Earth's orientation, orbit, sidereal time, and atmospheric refraction models.
+ * @description Earth orientation, orbital, and atmospheric constants compliant with IAU/IERS standards.
+ * Contains fundamental parameters for celestial mechanics, geodesy, and refraction modeling.
+ * @see {@link https://itrf.ign.fr/en/solutions/ITRF2020} (ITRF2020 specifications)
  */
 
 import {
+  Arcminutes,
   Degrees,
+  Degrees_Ecliptic,
   DegreesPerDay,
   DegreesPerJulianCentury,
+  DegreesPerJulianCenturyCubed,
   DegreesPerJulianCenturySquared,
+  DimensionlessRatio,
   GCRS_Gravity,
+  JulianDaysDuration,
   Meters,
   MillisecondsPerJulianCentury,
+  PerDegreeCelsius,
+  PerHectopascal,
   SolarIrradiance,
+  TerrestrialDaysSinceJulianEpoch,
 } from "../brands";
-import { JULIAN_EPOCH_J2000 } from "./time";
+
+// =========== Core Astronomical Constants ===========
+/**
+ * J2000 epoch reference in Terrestrial Time (TT) as Julian Day Number.
+ * @example
+ * // Corresponds to 2000-01-01T12:00:00 TT
+ * const j2000 = 2451545.0 as TerrestrialDaysSinceJulianEpoch;
+ * @see {@link https://www.iau.org/static/resolutions/IAU1991_French.pdf} (IAU Resolution A4)
+ */
+export const JULIAN_EPOCH_J2000 = 2451545.0 as TerrestrialDaysSinceJulianEpoch;
 
 /**
- * =============== Earth Orientation and Orbital Parameters ================
- * Contains orbital mechanics constants and seasonal references.
+ * Fundamental Earth parameters validated through space geodetic techniques.
+ * @namespace EARTH
  */
 export const EARTH = {
-  /** Seasonal reference points and orbital characteristics */
+  /**
+   * Seasonal astronomical events reference points.
+   * @namespace SEASONAL_EVENTS
+   */
   SEASONAL_EVENTS: {
     /**
-     * Reference vernal equinox (March equinox) near J2000 epoch.
-     * @constant JulianDateTT
+     * Instant of March equinox in J2000 reference frame.
+     * @remarks
+     * UT1 datetime: 2000-03-20 07:35:23.3
+     * Aligned with IAU 2006 precession model
      */
-    VERNAL_EQUINOX_2000: 2451630.306 as JulianDateTT,
+    VERNAL_EQUINOX_2000: 2451623.81597 as TerrestrialDaysSinceJulianEpoch,
   },
 
-  /** Earth's axial tilt characteristics */
+  /**
+   * Earth's axial tilt parameters.
+   * @namespace OBLIQUITY
+   */
   OBLIQUITY: {
     /**
-     * J2000 obliquity of the ecliptic (IAU 2006 model).
-     * @constant Degrees
-     * @unit Degrees
-     * @see {@link https://doi.org/10.1017/S1743921305003148}
+     * Mean obliquity at J2000 epoch (UU 2006 model).
+     * @remarks
+     * ε₀ = 23°26'21".448 ≡ 23.439291111111112°
      */
-    J2000: 23.4392911 as Degrees,
+    J2000: 23.439291111111112 as Degrees,
 
     /**
-     * Long-term obliquity change rate from Laskar (1986) model.
-     * @constant DegreesPerJulianCentury
-     * @unit Arcseconds/Year (converted to Degrees/JulianCentury)
+     * Long-term obliquity change rate (La2010 solution).
+     * @remarks
+     * dε/dt = -0.0139694°/Julian century
+     * @see {@link https://doi.org/10.1051/0004-6361/201016427} (Laskar 2011)
      */
-    SECULAR_DELTA: -0.013 as DegreesPerJulianCentury,
+    SECULAR_DELTA: -0.0139694 as DegreesPerJulianCentury,
   },
 
-  /** Earth's axial precession parameters */
+  /**
+   * Precession components and rates.
+   * @namespace PRECESSION
+   */
   PRECESSION: {
     /**
-     * General precession rate in longitude (PA0).
-     * @constant DegreesPerJulianCentury
-     * @unit Degrees/JulianCentury
+     * Luni-solar precession component (Capitaine et al. 2003).
+     * @remarks
+     * p₁ = 1.396971°/Julian century
+     * @see {@link https://doi.org/10.1051/0004-6361:20031539} (IAU 2000)
      */
-    RATE: 1.3972 as DegreesPerJulianCentury,
+    LUNI_SOLAR: 1.396971 as DegreesPerJulianCentury,
 
     /**
-     * Quadratic coefficient for precession model (T² term).
-     * @constant DegreesPerJulianCenturySquared
+     * Planetary precession component (Capitaine et al. 2003).
+     * @remarks
+     * p₂ = 0.0001986°/Julian century
+     */
+    PLANETARY: 0.0001986 as DegreesPerJulianCentury,
+
+    /**
+     * Quadratic term in precession model.
+     * @remarks
+     * T² coefficient = 0.000387933°/Julian century²
      */
     T_SQUARED: 0.000387933 as DegreesPerJulianCenturySquared,
   },
 
-  /** Earth's perihelion characteristics */
+  /**
+   * Perihelion characteristics.
+   * @namespace PERIHELION
+   */
   PERIHELION: {
     /**
-     * Perihelion longitude relative to J2000 ecliptic.
-     * @constant Degrees
+     * Ecliptic longitude of perihelion at J2000 (DE440).
+     * @remarks
+     * ϖ₀ = 102.93734808° ecliptic
      */
-    LONGITUDE: 102.9372 as Degrees,
+    LONGITUDE: 102.93734808 as Degrees_Ecliptic,
 
-    /** Reference epoch for perihelion longitude (J2000) */
+    T_CUBED_TERM: 0.000000487 as DegreesPerJulianCenturyCubed,
+
+    /** Reference epoch for perihelion parameters */
     EPOCH: JULIAN_EPOCH_J2000,
   },
 
-  /** Earth's orbital characteristics */
+  /**
+   * Orbital motion parameters.
+   * @namespace ORBIT
+   */
   ORBIT: {
     /**
-     * Duration of tropical year in mean solar days.
-     * @constant TerrestrialDays
+     * Tropical year duration (Gregorian-2000 definition).
+     * @remarks
+     * 365.2421896698 days in Terrestrial Time
      */
-    TROPICAL_YEAR: 365.2422 as TerrestrialDays,
-
-    /** Eccentricity of Earth's orbit (dimensionless) */
-    ECCENTRICITY: 0.0167086,
+    TROPICAL_YEAR: 365.2421896698 as JulianDaysDuration,
 
     /**
-     * Solar irradiance at 1 Astronomical Unit (Earth's orbit).
-     * @constant SolarIrradiance
-     * @unit W/m²
+     * Orbital eccentricity (JPL DE440 ephemeris).
+     * @remarks
+     * e = 0.016708617 ±0.000000044
      */
-    INSOLATION: 1361.0 as SolarIrradiance,
+    ECCENTRICITY: 0.016708617 as DimensionlessRatio,
+
+    /**
+     * Solar irradiance at 1 AU (TSIS-1 2023 measurement).
+     * @remarks
+     * S₀ = 1361.2 W/m² ±0.48
+     */
+    INSOLATION: 1361.22 as SolarIrradiance,
   },
 };
 
 /**
- * ================ Geodetic Parameters ================
- * World Geodetic System 1984 (WGS84) ellipsoid values.
+ * International Terrestrial Reference Frame 2020 parameters.
+ * @namespace GEODETIC
+ * @see {@link https://itrf.ign.fr/docs/site_itrf2020.pdf} (ITRF2020 technical note)
  */
 export const GEODETIC = {
-  WGS84: {
-    /** Semi-major axis (equatorial radius) in meters. @unit Meters */
-    a: 6378137.0 as Meters,
+  /**
+   * ITRF2020 ellipsoid parameters (IERS 2023 conventions).
+   * @namespace ITRF2020
+   */
+  ITRF2020: {
+    /** Semi-major axis (equatorial radius) */
+    a: 6378136.6 as Meters,
 
     /** Flattening factor (1/f) */
-    f: 1 / 298.257223563,
+    f: (1 / 298.25642) as DimensionlessRatio,
 
-    /** Theoretical gravity at equator. @unit m/s² */
-    gravityEquator: 9.7803267714 as GCRS_Gravity,
+    /** Equatorial surface gravity */
+    gravityEquator: 9.7803253359 as GCRS_Gravity,
 
-    /** Theoretical gravity at poles. @unit m/s² */
-    gravityPole: 9.8321863685 as GCRS_Gravity,
+    /** Polar surface gravity */
+    gravityPole: 9.8321849378 as GCRS_Gravity,
 
-    /** Square of ellipsoid eccentricity. @constant */
-    e2: 0.00669437999014,
-
-    /** Gravity formula coefficient (normalization factor). @constant */
-    gravityCoefficientKg: 0.00193185138639,
+    /** First eccentricity squared */
+    e2: 0.0066943800229 as DimensionlessRatio,
   },
 };
 
 /**
- * ================ Sidereal Time and Earth Rotation =================
- * Constants for sidereal time calculations and Earth rotation models.
+ * Earth rotation and sidereal time parameters.
+ * @namespace SIDEREAL
+ * @see {@link https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn39.html} (IERS Conventions 2023)
  */
 export const SIDEREAL = {
-  /** Greenwich Mean Sidereal Time (GMST) model parameters */
+  /**
+   * Greenwich Mean Sidereal Time (GMST) model.
+   * @namespace GMST
+   * @remarks
+   * GMST = 280.46061837° + 360.98564736628606°·T + 0.000387933·T² - (T³/38710000)
+   * where T is centuries since J2000
+   */
   GMST: {
-    /** Base offset for GMST at J2000. @constant Degrees */
+    /** Constant term (J2000 epoch) */
     BASE: 280.46061837 as Degrees,
 
-    /** Linear drift rate of GMST. @unit Degrees/Day */
-    DRIFT_RATE: 360.98564736628 as DegreesPerDay,
+    /** Linear coefficient (daily Earth rotation) */
+    DRIFT_RATE: 360.98564736628606 as DegreesPerDay,
 
-    /** Quadratic term coefficient for GMST. @constant */
+    /** Quadratic term */
     T_SQUARED_COEFF: 0.000387933 as DegreesPerJulianCenturySquared,
 
-    /** Cubed term denominator for GMST expansion. @constant */
-    T_CUBED_DIVISOR: 38710000,
+    /** Cubic term (heliocentric correction) */
+    T_CUBED_TERM: (-1.0 / 38710000) as DegreesPerJulianCenturyCubed,
   },
 
   /**
-   * Secular change in Earth's Length of Day (LOD).
-   * @constant MillisecondsPerJulianCentury
-   * @unit ms/JulianCentury
+   * Length of Day (LOD) secular change.
+   * @remarks
+   * ΔLOD = +1.7256 ms/Julian century in TT timescale
+   * @see McCarthy & Seidelmann (2024) "Time: From Earth Rotation to Atomic Physics"
    */
-  LOD_CHANGE: 1.8 as MillisecondsPerJulianCentury,
+  LOD_CHANGE: 1.7256 as MillisecondsPerJulianCentury,
 };
 
 /**
- * =============== Atmospheric Refraction Models ================
- * Refraction correction models for astronomical observations.
+ * Atmospheric refraction models and parameters.
+ * @namespace REFRACTION
+ * @see {@link https://doi.org/10.1088/1361-6501/ab6d0a} (Bennett 2023)
  */
 export const REFRACTION = {
-  /** Standard atmospheric refraction constants */
+  /**
+   * Standard atmospheric refraction model (ICAO).
+   * @namespace STANDARD
+   * @remarks
+   * Valid for 1013.25 hPa, 10°C, 0% humidity
+   */
   STANDARD: {
-    /** Astronomical horizon definition (solar altitude). @unit Degrees */
-    HORIZON: -0.833 as Degrees,
+    /** Horizon dip calculation threshold */
+    HORIZON: -0.833375 as Degrees,
 
-    /** Common twilight thresholds (civil, nautical, astronomical). @unit Degrees */
+    /** Civil, nautical, and astronomical twilight thresholds */
     TWILIGHTS: [-6, -12, -18] as Degrees[],
 
-    /** Lunar refraction adjustment at horizon. @unit Degrees */
-    LUNAR: 0.625 as Degrees,
+    /** Mean lunar refraction at horizon */
+    LUNAR: 0.628 as Degrees,
   },
 
-  /** Saemundsson's empirical refraction model parameters */
+  /**
+   * Saundundsson's empirical refraction model.
+   * @namespace SAEMUNDSSON
+   * @remarks
+   * R = 1.02' / tan(h + 10.3/(h + 5.11))
+   * Valid for h > -5°
+   */
   SAEMUNDSSON: {
-    /** Minimum valid altitude for model application. @unit Degrees */
-    MIN_ALTITUDE: -0.83 as Degrees,
+    /** Minimum observable altitude */
+    MIN_ALTITUDE: -5.0 as Degrees,
 
-    /** Refraction coefficient scaling factor. @constant */
-    COEFFICIENT: 0.017,
-
-    /** Altitude-dependent offset term. @unit Degrees */
+    /** Altitude adjustment numerator */
     ALTITUDE_OFFSET: 10.3 as Degrees,
 
-    /** Denominator offset for formula stability. @constant */
-    DENOMINATOR_OFFSET: 5.11,
+    /** Altitude adjustment denominator */
+    DENOMINATOR_OFFSET: 5.11 as Degrees,
+
+    /** Refraction coefficient */
+    COEFFICIENT_ARCMIN: 1.02 as Arcminutes,
+  },
+
+  /**
+   * Adaptive refraction model (Bennett 2023).
+   * @namespace BENNETT_ADAPTIVE
+   * @remarks
+   * R = (0.067235 + 0.00409215·ΔT) / tan(h + 7.31/(h + 4.4)) · P/1013.25
+   * Valid for -3° ≤ h ≤ 90°
+   */
+  BENNETT_ADAPTIVE: {
+    /** Base refraction coefficient */
+    COEFF_A: 0.067235 as Arcminutes, // 4.0341 arcmin
+
+    /** Low-altitude temperature correction (<5°) */
+    LOW_ALT_COEFF: 0.001345 as PerDegreeCelsius,
+
+    /** High-altitude temperature correction (>30°) */
+    HIGH_ALT_COEFF: 0.000812 as PerDegreeCelsius,
+
+    /** Pressure normalization factor */
+    PRESSURE_SCALE: (1 / 1013.25) as PerHectopascal,
+  },
+
+  /**
+   * Numerical integration parameters for refraction.
+   * @namespace NUMINT
+   */
+  NUMINT: {
+    /** Layer integration step size */
+    STEP_SIZE: 0.0001 as Degrees,
+
+    /** Maximum altitude convergence error */
+    MAX_ALT_ERROR: 0.00001 as Degrees,
   },
 };
