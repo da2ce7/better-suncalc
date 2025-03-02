@@ -3,9 +3,9 @@
  * @description Branded types for unit-specific constants to ensure type safety and prevent unit mismatches.
  */
 
-import { AstronomicalUnits, Degrees } from "./brands";
+import { AstronomicalUnits, Degrees } from './brands'
 
-export type Brand<T, U extends string> = T & { readonly __brand: U };
+export type Brand<T, Tag> = { readonly _: Tag; value: T }
 
 /**
  * Represents orbital parameters for celestial bodies.
@@ -15,7 +15,7 @@ export type Brand<T, U extends string> = T & { readonly __brand: U };
  * @property {AstronomicalUnits} semiMajorAxis - Semi-major axis of the orbit in AstronomicalUnits.
  */
 export interface OrbitalParameters {
-  eccentricity: number; // Unitless
-  inclination: Degrees;
-  semiMajorAxis: AstronomicalUnits;
+    eccentricity: number // Unitless
+    inclination: Degrees
+    semiMajorAxis: AstronomicalUnits
 }

@@ -189,22 +189,22 @@ export {
  * Types for positional data tied to specific reference frames or epochs.
  */
 export {
+  Coordinates_FocalPlane,
+  Coordinates_ITRF,
   Degrees_Ecliptic_J2000,
   Degrees_Ecliptic_MeanOfDate,
+  Degrees_Equatorial_Geocentric,
+  Degrees_Equatorial_Mean,
   Degrees_Galactic_IAU1958,
-  Degrees_GeocentricEquatorial,
+  Degrees_Horizontal_Observed,
   Degrees_ICRF,
-  Degrees_ITRF,
-  Degrees_MeanEquator,
-  Degrees_ObservedHorizontal,
-  FocalPlaneCoordinates,
 } from "./coordinates";
 
 /**
  * Time and Dates
  * Types for representing dates, epochs, and durations with time scale specificity.
  */
-export { BesselianEpoch, JulianEpoch } from "./temporal/epochs";
+export { Epoch_B1950, Epoch_J2000 } from "./temporal/epochs";
 
 export {
   AtomicSecondsSinceTAIEpoch,
@@ -220,7 +220,6 @@ export {
 } from "./temporal/dates";
 
 export {
-  GPS_SecondsDuration,
   HoursDuration,
   JulianCenturiesDuration,
   JulianDaysDuration,
@@ -228,9 +227,10 @@ export {
   MillisecondsDuration,
   MinutesDuration,
   SecondsDuration,
-  TAI_SecondsDuration,
-  TDB_SecondsDuration,
-  TT_SecondsDuration,
+  SecondsDuration_GPS,
+  SecondsDuration_TAI,
+  SecondsDuration_TDB,
+  SecondsDuration_TT,
 } from "./temporal/durations";
 
 /**

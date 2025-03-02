@@ -1,5 +1,5 @@
 /**
- * @file constraints/brands/dates.ts
+ * @file constraints/brands/temporal/dates.ts
  * @module dates
  * @description Branded type definitions for temporal values representing durations since specific epochs.
  *
@@ -17,7 +17,7 @@
  * @see {@link https://en.wikipedia.org/wiki/Julian_day|Julian Date}
  */
 
-import { Brand } from "../../types";
+import { Brand } from '../../types'
 
 /**
  * Days in Terrestrial Time (TT) since J2000 epoch (January 1, 2000 12:00 TT)
@@ -25,16 +25,16 @@ import { Brand } from "../../types";
  * const newYear2000TT: TerrestrialDaysSinceJ2000 = 0.0 as TerrestrialDaysSinceJ2000;
  */
 export type TerrestrialDaysSinceJ2000 = Brand<
-  number,
-  "TerrestrialDaysSinceJ2000"
->;
+    number,
+    'TerrestrialDaysSinceJ2000'
+>
 
 /**
  * Days in Universal Time (UT1) since J2000 epoch
  * @example
  * const observationDate: UniversalDaysSinceJ2000 = 8325.75 as UniversalDaysSinceJ2000;
  */
-export type UniversalDaysSinceJ2000 = Brand<number, "UniversalDaysSinceJ2000">;
+export type UniversalDaysSinceJ2000 = Brand<number, 'UniversalDaysSinceJ2000'>
 
 /**
  * Centuries in Terrestrial Time since J2000 epoch (T = days/36525 from J2000)
@@ -42,9 +42,9 @@ export type UniversalDaysSinceJ2000 = Brand<number, "UniversalDaysSinceJ2000">;
  * const tDB: TerrestrialCenturiesSinceJ2000 = 0.1 as TerrestrialCenturiesSinceJ2000;
  */
 export type TerrestrialCenturiesSinceJ2000 = Brand<
-  number,
-  "TerrestrialCenturiesSinceJ2000"
->;
+    number,
+    'TerrestrialCenturiesSinceJ2000'
+>
 
 /**
  * Days in Terrestrial Time since Julian epoch (4713 BC January 1 BC)
@@ -52,9 +52,9 @@ export type TerrestrialCenturiesSinceJ2000 = Brand<
  * const jdLaunch: TerrestrialDaysSinceJulianEpoch = 2458849.5 as TerrestrialDaysSinceJulianEpoch; // SpaceX DM-1
  */
 export type TerrestrialDaysSinceJulianEpoch = Brand<
-  number,
-  "TerrestrialDaysSinceJulianEpoch"
->;
+    number,
+    'TerrestrialDaysSinceJulianEpoch'
+>
 
 /**
  * Days in Universal Time (UT1) since Julian epoch
@@ -62,9 +62,9 @@ export type TerrestrialDaysSinceJulianEpoch = Brand<
  * const jdEclipse: UniversalDaysSinceJulianEpoch = 2459620.75 as UniversalDaysSinceJulianEpoch;
  */
 export type UniversalDaysSinceJulianEpoch = Brand<
-  number,
-  "UniversalDaysSinceJulianEpoch"
->;
+    number,
+    'UniversalDaysSinceJulianEpoch'
+>
 
 /**
  * Days in UTC since Modified Julian epoch (1858-11-17 00:00:00 UTC)
@@ -72,9 +72,9 @@ export type UniversalDaysSinceJulianEpoch = Brand<
  * const mjdNow: CoordinatedDaysSinceModifiedJulianEpoch = 60382.3 as CoordinatedDaysSinceModifiedJulianEpoch;
  */
 export type CoordinatedDaysSinceModifiedJulianEpoch = Brand<
-  number,
-  "CoordinatedDaysSinceModifiedJulianEpoch"
->;
+    number,
+    'CoordinatedDaysSinceModifiedJulianEpoch'
+>
 
 /**
  * Seconds in UTC since Unix Epoch (1970-01-01T00:00:00Z)
@@ -82,9 +82,9 @@ export type CoordinatedDaysSinceModifiedJulianEpoch = Brand<
  * const unixNow: CoordinatedSecondsSinceUnixEpoch = 1717027200 as CoordinatedSecondsSinceUnixEpoch;
  */
 export type CoordinatedSecondsSinceUnixEpoch = Brand<
-  number,
-  "CoordinatedSecondsSinceUnixEpoch"
->;
+    number,
+    'CoordinatedSecondsSinceUnixEpoch'
+>
 
 /**
  * Milliseconds in UTC since Unix Epoch
@@ -92,16 +92,16 @@ export type CoordinatedSecondsSinceUnixEpoch = Brand<
  * const jsDate: CoordinatedMillisecondsSinceUnixEpoch = Date.now() as CoordinatedMillisecondsSinceUnixEpoch;
  */
 export type CoordinatedMillisecondsSinceUnixEpoch = Brand<
-  number,
-  "CoordinatedMillisecondsSinceUnixEpoch"
->;
+    number,
+    'CoordinatedMillisecondsSinceUnixEpoch'
+>
 
 /**
  * Seconds in GPS Time scale since GPS epoch (1980-01-06T00:00:00 UTC)
  * @example
  * const gpsTimestamp: GPSSecondsSinceGPSEpoch = 1389376278 as GPSSecondsSinceGPSEpoch;
  */
-export type GPSSecondsSinceGPSEpoch = Brand<number, "GPSSecondsSinceGPSEpoch">;
+export type GPSSecondsSinceGPSEpoch = Brand<number, 'GPSSecondsSinceGPSEpoch'>
 
 /**
  * Seconds in International Atomic Since TAI epoch (1958-01-01T00:00:00 TAI)
@@ -109,6 +109,6 @@ export type GPSSecondsSinceGPSEpoch = Brand<number, "GPSSecondsSinceGPSEpoch">;
  * const taiNow: AtomicSecondsSinceTAIEpoch = 2000000000 as AtomicSecondsSinceTAIEpoch;
  */
 export type AtomicSecondsSinceTAIEpoch = Brand<
-  number,
-  "AtomicSecondsSinceTAIEpoch"
->;
+    number,
+    'AtomicSecondsSinceTAIEpoch'
+>

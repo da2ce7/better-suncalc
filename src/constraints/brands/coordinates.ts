@@ -12,96 +12,81 @@
  * - **Observed Horizontal**: Topocentric Alt/Az including atmospheric refraction
  */
 
-import { Brand } from "../types";
-import { Degrees_Equatorial } from "./angles";
+import { ContextBrand, FrameBrand } from ".";
+
+// ============= Celestial Reference Frames ============= //
 
 /**
  * Represents equatorial coordinates in the International Celestial Reference Frame (ICRF),
- * aligned with extragalactic radio sources at J2000.0 epoch. This inertial frame forms the
- * basis for modern star catalogs like Gaia DR3.
- *
- * @see {@link https://www.iers.org/IERS/EN/Science/ICRF/icrf.html}
+ * aligned with extragalactic radio sources at J2000.0 epoch.
  * @example
  * const gaiaRa: Degrees_ICRF = 12.456 as Degrees_ICRF;
  */
-export type Degrees_ICRF = Brand<number, "ICRF">;
+export type Degrees_ICRF = FrameBrand<number, "ICRF">;
 
 /**
- * Represents epoch-of-date equatorial coordinates in the "Mean Equator and Equinox" system,
- * incorporating luni-solar precession and planetary nutation. Used for most observational
- * astronomy workflow steps (telescope pointing, visible star catalogs).
- *
- * @see IAU 2006 Precession Model
+ * Represents epoch-of-date equatorial coordinates in the "Mean Equator and Equinox" system.
  * @example
- * const telescopePointing: Degrees_MeanEquator = 194.3 as Degrees_MeanEquator;
+ * const telescopePointing: Degrees_Equatorial_Mean = 194.3 as Degrees_Equatorial_Mean;
  */
-export type Degrees_MeanEquator = Brand<number, "MeanEquinox">;
+export type Degrees_Equatorial_Mean = FrameBrand<number, "MeanEquinox">;
+
+// ============= Observed Coordinates ============= //
 
 /**
- * Represents observed horizontal (alt/az) coordinates with atmospheric refraction applied.
- * Values represent the apparent position visible through an optical system under local
- * atmospheric conditions (temperature, pressure, humidity).
- *
- * @see Saemundsson Refraction Formula
+ * Represents observed horizontal coordinates with atmospheric refraction.
+.
  * @example
- * const observedAlt: Degrees_ObservedHorizontal = 34.5 as Degrees_ObservedHorizontal;
+ * const observedAlt: Degrees_Horizontal_Observed = 34.5 as Degrees_Horizontal_Observed;
  */
-export type Degrees_ObservedHorizontal = Brand<number, "Observed">;
+export type Degrees_Horizontal_Observed = ContextBrand<
+  number,
+  "ObservedHorizontal"
+>;
 
 // ============= Ecliptic Coordinates ============= //
 
 /**
- * Represents ecliptic coordinates in the J2000.0 reference frame (Earth's orbital plane
- * at J2000 epoch, IERS Conventions 2003). Primary use case: solar system object tracking.
- *
+ * Represents J2000.0 ecliptic coordinates (Earth's orbital plane at J2000 epoch).
  * @example
  * const jupiterEcliptic: Degrees_Ecliptic_J2000 = 159.3 as Degrees_Ecliptic_J2000;
  */
-export type Degrees_Ecliptic_J2000 = Brand<number, "Ecliptic_J2000">;
+export type Degrees_Ecliptic_J2000 = FrameBrand<number, "Ecliptic_J2000">;
 
 /**
- * Represents mean ecliptic coordinates adjusted to current epoch via IAU 2006 precession.
- * Used for high-precision solar system dynamics (e.g., satellite ecliptic node analysis).
+ * Represents mean ecliptic coordinates adjusted via IAU 2006 precession.
  */
-export type Degrees_Ecliptic_MeanOfDate = Brand<number, "Ecliptic_MeanOfDate">;
+export type Degrees_Ecliptic_MeanOfDate = FrameBrand<
+  number,
+  "Ecliptic_MeanOfDate"
+>;
 
 // ============= Galactic Coordinates ============= //
 
 /**
- * Represents galactic coordinates in ICRS-aligned frame (IAU 1958 definition),
- * with galactic center at l=0°, b=0°. Standard for Milky Way structure studies.
- *
+ * Represents galactic coordinates using IAU 1958 definition.
  * @example
  * const galacticCenter: Degrees_Galactic_IAU1958 = 0.0 as Degrees_Galactic_IAU1958;
  */
-export type Degrees_Galactic_IAU1958 = Brand<number, "Galactic_IAU1958">;
+export type Degrees_Galactic_IAU1958 = FrameBrand<number, "Galactic_IAU1958">;
 
 // ============= Terrestrial Coordinates ============= //
 
 /**
- * Represents International Terrestrial Reference Frame (ITRF) coordinates,
- * Earth-fixed cartesian system with plate tectonic motion over time.
- * Used for GNSS and spacecraft localization relative to Earth's surface.
- *
- * @see {@link https://itrf.ign.fr/}
+ * Represents International Terrestrial Reference Frame (ITRF) coordinates.
  * @example
- * const spitzerPosition: Degrees_ITRF = [-118.1, 34.2, 0.0] as Degrees_ITRF;
+ * const spitzerPosition: Coordinates_ITRF = [-118.1, 34.2, 0.0] as Coordinates_ITRF;
  */
-export type Degrees_ITRF = Brand<number[], "ITRF">;
+export type Coordinates_ITRF = FrameBrand<number[], "ITRF">;
 
 /**
- * Represents GEOCENTRIC equatorial coordinates (Earth-centered inertial),
- * commonly used for satellite orbit calculations.
+ * Represents geocentric equatorial coordinates (Earth-centered inertial).
  */
-export type Degrees_GeocentricEquatorial = Brand<
-  Degrees_Equatorial,
-  "Geocentric"
->;
-
-// ============= Sensor-Specific Coordinates ============= //
+export type Degrees_Equatorial_Geocentric = FrameBrand<number, "Geocentric">;
+//// ============= Instrument Coordinates ============= //
 
 /**
- * Represents focal plane coordinates for a telescope instrument (mm relative to optical axis).
- * Instrument-specific implementations should subtype this (e.g., JWST_NIRCam_FocalPlane).
+ * Represents focal plane coordinates relative to optical axis.
  */
-export type FocalPlaneCoordinates = Brand<number[], "FocalPlane">;
+
+export type Coordinates_FocalPlane = FrameBrand<number[], "FocalPlane">;
